@@ -152,7 +152,7 @@ class IPhotoData(object):
             self.albums[album.albumid] = album
 
         self._rolls = {}
-	if not self.aperture:
+        if not self.aperture:
             roll_data = self.data2.get("List of Rolls")
             if roll_data:
                 for roll in roll_data:
@@ -394,8 +394,13 @@ class IPhotoImage(object):
                 self.date = datetime.datetime(year, month, date)
             else:
                 self.date = None
-        self.mod_date = applexml.getappletime(
-            data.get("ModDateAsTimerInterval"))
+        if data.has_key("ModDateAsTimerInterval"):
+            self.mod_date = applexml.getappletime(data.get("ModDateAsTimerInterval"))
+        else:
+            if data.has_key("MetaModDateAsTimerInterval"):
+                self.mod_date = applexml.getappletime(data.get("MetaModDateAsTimerInterval"))
+            else:
+                self.mod_Date = None
         self.image_path = data.get("ImagePath")
         if data.has_key("Rating"):
             self.rating = int(data.get("Rating"))
@@ -578,7 +583,7 @@ class IPhotoContainer(object):
             if data.get("uuid"):
                 self.uuid = data.get("uuid")
                 if self.uuid == 'lastImportAlbum':
-	            albumtype = "Special Roll"
+                    albumtype = "Special Roll"
             if 'Comments' in data:
                 self.comment = data.get("Comments")
 
