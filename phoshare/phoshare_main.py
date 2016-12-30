@@ -877,11 +877,6 @@ def get_option_parser():
                       help="Export original files into Originals.")
     p.add_option("--picasa", action="store_true",
                       help="Store originals in .picasaoriginals")
-    p.add_option('--picasapassword',
-                 help='PicasaWeb password (optional).')
-    p.add_option('--picasaweb',
-                 help="""Export to PicasaWeb albums of specified user
-                 (available in future version of Phoshare).""")
     p.add_option("--pictures", action="store_false", dest="movies",
                  default=True,
                  help="Export pictures only (no movies).")
@@ -933,7 +928,7 @@ def run_phoshare(cmd_args):
         parser.error("Need to specify the iPhoto library with the --iphoto "
                      "option.")
 
-    if options.export or options.picasaweb or options.checkalbumsize:
+    if options.export or options.checkalbumsize:
         if not (options.albums or options.events or options.smarts or
                 options.facealbums):
             parser.error("Need to specify at least one event, album, or smart "
@@ -942,13 +937,6 @@ def run_phoshare(cmd_args):
     else:
         parser.error("No action specified. Use --export to export from your "
                      "iPhoto library.")
-
-    if options.picasaweb:
-        if options.picasapassword:
-            google_password = options.picasapassword
-        else:
-            google_password = getpass.getpass('Google password for %s: ' %
-                                              options.picasaweb)
 
     if options.ratings:
         options.ratings = [int(r) for r in options.ratings.split(",")]
@@ -982,13 +970,6 @@ def run_phoshare(cmd_args):
     if options.export:
         album = ExportLibrary(su.expand_home_folder(options.export))
         export_iphoto(album, data, options.exclude, options)
-    if options.picasaweb:
-        try:
-            import phoshare.picasaweb as picasaweb
-            albums = picasaweb.PicasaAlbums(options.picasaweb, google_password)
-            export_iphoto(albums, data, options.exclude, options)
-        except ImportError:
-            su.perr('Sorry, this version of Phoshare does not support uploading to PicasaWeb.')
 
 
 def main():
