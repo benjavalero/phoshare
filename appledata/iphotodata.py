@@ -171,14 +171,13 @@ class IPhotoData(object):
             other_image_list.append(image)
     '''
 
-
     def _getapplicationversion(self):
         return self.data.get("Application Version")
     applicationVersion = property(_getapplicationversion, doc='iPhoto version')
 
     def _getimages(self):
         return self.images_by_id.values()
-    images = property(_getimages, "List of images")
+    images = property(_getimages, doc="List of images")
 
     '''
     def _getrolls(self):
@@ -380,9 +379,9 @@ class IPhotoImage(object):
         self.face_rectangles = []
         '''
 
-        self.event_name = '' # name of event (roll) that this image belongs to
-        self.event_index = '' # index within event
-        self.event_index0 = '' # index with event, left padded with 0
+        self.event_name = ''    # name of event (roll) that this image belongs to
+        self.event_index = ''   # index within event
+        self.event_index0 = ''  # index with event, left padded with 0
 
         '''
         face_list = data.get("Faces")
@@ -524,9 +523,8 @@ class IPhotoContainer(object):
         self.master = False
         '''
 
-
         hidden = 0
-        if data and data.has_key("KeyList"):
+        if data and ("KeyList" in data):
             keylist = data.get("KeyList")
             for key in keylist:
                 if not key:
@@ -626,7 +624,7 @@ class IPhotoAlbum(IPhotoContainer):
 
     def __init__(self, data, images, album_map, root_album):
         IPhotoContainer.__init__(self, data.get("AlbumName"),
-                                 data.get("Album Type") if data.has_key("Album Type") else "Regular",
+                                 data.get("Album Type") if ("Album Type" in data) else "Regular",
                                  data, images)
         self.albumid = data.get("AlbumId")
 

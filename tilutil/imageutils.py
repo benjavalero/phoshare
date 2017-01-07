@@ -525,7 +525,7 @@ def format_photo_name(photo, album_name, index, padded_index,
                                               nodate_album=nodate_album_name,
                                               nodate_event=nodate_event_name,
                                               title=orig_basename,
-                                              caption=orig_basename, # backward compatibility
+                                              caption=orig_basename,  # backward compatibility
                                               ascii_title=ascii_title,
                                               plain_title=plain_title,
                                               yyyy=year,

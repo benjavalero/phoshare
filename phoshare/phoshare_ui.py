@@ -31,7 +31,7 @@ import traceback
 import unicodedata
 
 # pylint: disable-msg=W0614
-from Tkinter import *  #IGNORE:W0401
+from Tkinter import *  # IGNORE:W0401
 
 import appledata.iphotodata as iphotodata
 import phoshare.phoshare_main as phoshare_main
@@ -263,7 +263,7 @@ http://code.google.com/p/phoshare""" % (phoshare_version.PHOSHARE_VERSION,),
                command=help_command).grid(row=0, column=1, sticky=E)
 
         content_frame = Frame(section_frame)
-        content_frame.grid(row= 1, column=0, columnspan=2, sticky=N+S+E+W, pady=5)
+        content_frame.grid(row=1, column=0, columnspan=2, sticky=N+S+E+W, pady=5)
 
         return (section_frame, content_frame)
 
@@ -434,7 +434,6 @@ http://code.google.com/p/phoshare""" % (phoshare_version.PHOSHARE_VERSION,),
         Label(lf, text="").grid(sticky=E)
         Label(lf, text="").grid(sticky=E)
         Label(lf, text="").grid(sticky=E)
-
 
     def create_widgets(self):
         """Builds the UI."""

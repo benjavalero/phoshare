@@ -68,7 +68,7 @@ def get_photos_library_file(library_dir):
         if os.path.exists(photos_library_file):
             return photos_library_file
     raise ValueError, ("%s does not appear to be a valid Photos "
-                       "library location.") % (library_dir)
+                       "library location.") % library_dir
 
 
 def get_photos_metaschema_file(library_dir):
@@ -78,7 +78,7 @@ def get_photos_metaschema_file(library_dir):
         if os.path.exists(photos_metaschema_file):
             return photos_metaschema_file
     raise ValueError, ("%s does not appear to be a valid Photos "
-                       "library location.") % (library_dir)
+                       "library location.") % library_dir
 
 
 def get_photos_imageproxies_file(library_dir):
@@ -88,7 +88,7 @@ def get_photos_imageproxies_file(library_dir):
         if os.path.exists(photos_imageproxies_file):
             return photos_imageproxies_file
     raise ValueError, ("%s does not appear to be a valid Photos "
-                       "library location.") % (library_dir)
+                       "library location.") % library_dir
 
 
 def read_apple_library(photos_library_dir):
@@ -108,28 +108,26 @@ def read_apple_library(photos_library_dir):
             library_version = int(result[0])
         photos_dict['Application Version'] = library_version
 
-
     if photos_imageproxies_file:
         # Resources
         conn3 = sqlite3.connect(photos_imageproxies_file)
         c3 = conn3.cursor()
-        c3.execute('select attachedModelId, resourceUuid, filename from RKModelResource '
-                  'where attachedModelType = 2 and resourceType = 4')
+        c3.execute('select attachedModelId, resource_uuid, filename from RKModelResource '
+                   'where attachedModelType = 2 and resourceType = 4')
         resources_dict = {}
         for result in c3.fetchall():
             attached_model_id = int(result[0])
             resource_dict = {}
-            resource_dict['resourceUuid'] = result[1]
+            resource_dict['resource_uuid'] = result[1]
             resource_dict['filename'] = result[2]
             resources_dict[attached_model_id] = resource_dict
-
 
     if photos_metaschema_file:
         # Folders
         conn2 = sqlite3.connect(photos_library_file)
         c2 = conn2.cursor()
         c2.execute('select uuid, modelId, name, parentFolderUuid, folderPath from RKFolder '
-                  'where folderType = 1 and isInTrash = 0 and isMagic = 0')
+                   'where folderType = 1 and isInTrash = 0 and isMagic = 0')
         folders_by_id = {}
         folders_by_uuid = {}
         for result in c2.fetchall():
@@ -156,12 +154,12 @@ def read_apple_library(photos_library_dir):
             # Load folder path
             album_data['FolderPath'] = None
             album_folder_uuid = result[3]
-            if folders_by_uuid.has_key(album_folder_uuid):
+            if album_folder_uuid in folders_by_uuid:
                 album_folder = folders_by_uuid[album_folder_uuid]
                 parent_folder_ids = album_folder['folderPath']
                 folder_path = ''
                 for folder_id in parent_folder_ids.split('/'):
-                    if folder_id and folders_by_id.has_key(int(folder_id)):
+                    if folder_id and (int(folder_id) in folders_by_id):
                         parent_folder = folders_by_id[int(folder_id)]
                         folder_path = os.path.join(folder_path, parent_folder['name'])
                 album_data['FolderPath'] = folder_path
@@ -173,33 +171,33 @@ def read_apple_library(photos_library_dir):
 
         # Masters
         c2 = conn2.cursor()
-        c2.execute('select modelId, uuid, imagePath from RKMaster '
-                  'where importComplete = 1 and isInTrash = 0')
+        c2.execute('select modelId, uuid, image_path from RKMaster '
+                   'where importComplete = 1 and isInTrash = 0')
         masters_dict = {}
         for result in c2.fetchall():
             model_id = int(result[0])
             master_dict = {}
-            master_dict['imagePath'] = result[2]
+            master_dict['image_path'] = result[2]
             masters_dict[model_id] = master_dict
 
         # Images
         images = {}
         for master_id in masters_dict:
             image_data = {}
-            if resources_dict.has_key(master_id):
+            if master_id in resources_dict:
                 resource_dict = resources_dict[master_id]
                 image_data['Caption'] = None  # TODO
-                resourceUuid = resource_dict['resourceUuid']
-                folder1 = str(ord(resourceUuid[0]))
-                folder2 = str(ord(resourceUuid[1]))
+                resource_uuid = resource_dict['resource_uuid']
+                folder1 = str(ord(resource_uuid[0]))
+                folder2 = str(ord(resource_uuid[1]))
                 filename = resource_dict['filename']
                 image_data['ImagePath'] = os.path.join(photos_library_dir, 'resources', 'modelresources',
-                                                       folder1, folder2, resourceUuid, filename)
+                                                       folder1, folder2, resource_uuid, filename)
             else:
                 master_dict = masters_dict[master_id]
                 image_data['Caption'] = None  # TODO
-                imagePath = master_dict['imagePath']
-                image_data['ImagePath'] = os.path.join(photos_library_dir, 'Masters', imagePath)
+                image_path = master_dict['image_path']
+                image_data['ImagePath'] = os.path.join(photos_library_dir, 'Masters', image_path)
             # TODO COMPLETE
             images[master_id] = image_data
         photos_dict['Master Image List'] = images
@@ -214,7 +212,7 @@ def read_apple_library(photos_library_dir):
             album_id = int(result[0])
             version_id = int(result[1])
 
-            if albums_by_id.has_key(album_id):
+            if album_id in albums_by_id:
                 album_data = albums_by_id[album_id]
                 album_data['KeyList'].append(version_id)
 

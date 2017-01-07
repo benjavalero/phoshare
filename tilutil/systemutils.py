@@ -46,7 +46,7 @@ def resolve_alias(path):
         fs, _, _ = FSResolveAliasFile(path, 1)
         return fsdec(fs.as_pathname())
     except (OSError, MacOS.Error) as ose:
-        pout(u"Failed to resolve alias for %s." % (path))
+        pout(u"Failed to resolve alias for %s." % path)
         return path
 
 '''
@@ -90,14 +90,14 @@ def equalscontent(string1, string2):
 
 def nn_string(value):
     """Returns a string that will be None (replaced by '')."""
-    if value == None:
+    if value is None:
         return ''
     return value
 
 def unicode_string(value):
     """Returns a unicode string, taking care of None and converting non-unicode
        input strings."""
-    if value == None:
+    if value is None:
         return u''
     if isinstance(value, unicode):
         return value
@@ -110,8 +110,8 @@ def os_listdir_unicode(folder):
     # passing a unicode directory name gives back unicode filenames, passing a
     # str directory name gives back str filenames. On MacOS, filenames come back
     # in Unicode Normalization Form D, so force to form C.
-    file_list = [ unicodedata.normalize("NFC", nfd) 
-                for nfd in os.listdir(unicode(folder)) ]
+    file_list = [unicodedata.normalize("NFC", nfd)
+                 for nfd in os.listdir(unicode(folder))]
     file_list.sort()
     return file_list
 

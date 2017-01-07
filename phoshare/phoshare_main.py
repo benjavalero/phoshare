@@ -146,10 +146,9 @@ class ExportFile(object):
             source_stat = os.stat(source_file)
             if export_stat.st_ino != source_stat.st_ino:
                 su.pout('Changed:  %s: inodes don\'t match: %d vs. %d' %
-                    (self.export_file, export_stat.st_ino, source_stat.st_ino))
+                        (self.export_file, export_stat.st_ino, source_stat.st_ino))
                 return True
-        if (os.path.getmtime(self.export_file) + _MTIME_FUDGE <
-            os.path.getmtime(source_file)):
+        if (os.path.getmtime(self.export_file) + _MTIME_FUDGE < os.path.getmtime(source_file)):
             su.pout('Changed:  %s: newer version is available: %s vs. %s' %
                     (self.export_file,
                      time.ctime(os.path.getmtime(self.export_file)),
@@ -255,7 +254,6 @@ class ExportFile(object):
         except (OSError, MacOS.Error) as ose:
             su.perr(u"Failed to export %s to %s: %s" % (self.photo.image_path, self.export_file,
                                                         ose))
-
 
     '''
     def get_export_keywords(self, do_face_keywords):
@@ -395,7 +393,7 @@ class ExportDirectory(object):
         '''
         self.iphoto_container = iphoto_container
         self.albumdirectory = albumdirectory
-        self.files = {} # lower case file names -> ExportFile
+        self.files = {}  # lower case file names -> ExportFile
 
     def add_iphoto_images(self, images, options):
         """Works through an image folder tree, and builds data for exporting."""
@@ -429,7 +427,7 @@ class ExportDirectory(object):
         while True:
             album_basename = base_name
             if index > 0:
-                album_basename += "_%d" % (index)
+                album_basename += "_%d" % index
             if self.files.get(album_basename.lower()) is None:
                 return album_basename
             index += 1
@@ -514,8 +512,6 @@ class ExportDirectory(object):
         for f in sorted(self.files):
             self.files[f].generate(options)
 
-
-
 '''
 class IPhotoFace(iphotodata.IPhotoContainer):
     """A photo container based on a face."""
@@ -578,7 +574,7 @@ class ExportLibrary(object):
             
             # check the album type
             if (sub_album.albumtype == "None" or
-                  not sub_album.albumtype in album_types):
+                sub_album.albumtype not in album_types):
                 # print "Ignoring " + sub_album.name + " of type " + \
                 # sub_album.albumtype
                 continue
@@ -709,7 +705,7 @@ def get_option_parser():
         is a regular expression. Use -a . to export all regular albums.""")
     p.add_option(
         '--captiontemplate', default='{description}',
-      help='Template for IPTC image captions. Default: "{description}".')
+        help='Template for IPTC image captions. Default: "{description}".')
     p.add_option(
         "-d", "--delete", action="store_true",
         help="Delete obsolete files that are no longer in your iPhoto library.")
@@ -763,17 +759,15 @@ def get_option_parser():
                  help='Maximum number of images to delete.')
     p.add_option("--max_update", type='int', default=-1,
                  help='Maximum number of images to update.')
-    p.add_option(
-      "-n", "--nametemplate", default="{title}",
-      help="""Template for naming image files. Default: "{title}".""")
+    p.add_option("-n", "--nametemplate", default="{title}",
+                 help="""Template for naming image files. Default: "{title}".""")
     p.add_option("-o", "--originals", action="store_true",
-                      help="Export original files into Originals.")
-    p.add_option(
-        "-s", "--smarts",
-        help="""Export matching smart albums. The argument
-        is a regular expression. Use -s . to export all smart albums.""")
+                 help="Export original files into Originals.")
+    p.add_option("-s", "--smarts",
+                 help="""Export matching smart albums. The argument
+                 is a regular expression. Use -s . to export all smart albums.""")
     p.add_option("-u", "--update", action="store_true",
-                      help="Update existing files.")
+                 help="Update existing files.")
     p.add_option('--verbose', action='store_true', 
                  help='Print verbose messages.')
     p.add_option('--version', action='store_true', 
@@ -792,13 +786,11 @@ def run_phoshare(cmd_args):
         return 1
 
     if options.iptc > 0 and not exiftool.check_exif_tool():
-        print >> sys.stderr, ("Exiftool is needed for the --itpc or --iptcall" +
-          " options.")
+        print >> sys.stderr, ("Exiftool is needed for the --itpc or --iptcall options.")
         return 1
 
     if not options.iphoto:
-        parser.error("Need to specify the iPhoto library with the --iphoto "
-                     "option.")
+        parser.error("Need to specify the iPhoto library with the --iphoto option.")
 
     if options.export:
         if not (options.albums or options.events or options.smarts or

@@ -98,29 +98,6 @@ class ImageUtilsTest(unittest.TestCase):
         image = self.TestImage('x', 'y')
         self.assertEqual(iu.get_photo_caption(image, template),
                          '-y-')
-        
-        #template = "{dated_caption_description}"
-        #image = self.TestImage('x', 'y')
-        #self.assertEqual(iu.get_photo_caption(image, template),
-        #                 'x: y')
-        #image = self.TestImage('x', '')
-        #self.assertEqual(iu.get_photo_caption(image, template),
-        #                 'x')
-        #image = self.TestImage('x', None)
-        #self.assertEqual(iu.get_photo_caption(image, template),
-        #                 'x')
-        #image = self.TestImage('20100510 Hello', 'y')
-        #self.assertEqual(iu.get_photo_caption(image, template),
-        #                 '2010/05/10 Hello: y')
-        #image = self.TestImage('20100511 Hello - 31', 'y')
-        #self.assertEqual(iu.get_photo_caption(image, template),
-        #                 '2010/05/11 Hello: y')
-        #image = self.TestImage('20100500 Hello - 31', 'y')
-        #self.assertEqual(iu.get_photo_caption(image, template),
-        #                 '2010/05 Hello: y')
-        #image = self.TestImage('20100000 Hello - 31', 'y')
-        #self.assertEqual(iu.get_photo_caption(image, template),
-        #                 '2010 Hello: y')
 
         image = self.TestImage('x', 'y')
         self.assertEqual('//', iu.get_photo_caption(image, '{yyyy}/{mm}/{dd}'))
@@ -137,7 +114,6 @@ class ImageUtilsTest(unittest.TestCase):
         # Bad template.
         self.assertEqual('{badfield}', iu.get_photo_caption(image, '{badfield}'))
 
-
     def test_format_album_name(self):
         album = self.TestAlbum('nnnn', datetime.datetime(2010, 12, 26, 11, 33, 12))
         self.assertEqual(
@@ -149,7 +125,6 @@ class ImageUtilsTest(unittest.TestCase):
 
         # Bad template.
         self.assertEqual('{badfield}', iu.format_album_name(album, album.name, '{badfield}'))
-        
 
     def test_format_photo_name(self):
         image = self.TestImage('tttt', 'dddd')
