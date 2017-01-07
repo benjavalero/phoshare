@@ -33,6 +33,7 @@ import tilutil.systemutils as su
 import tilutil.imageutils as imageutils
 
 EXIFTOOL = u"exiftool"
+'''
 _PEOPLE_PREFIX = u"People|"
 
 # The name of the file for storing cached IPTC data in a folder.
@@ -173,9 +174,11 @@ def _get_iptc_cache(image_file):
 
 # Most recently used cache data.
 _get_iptc_cache.cache = None
+'''
 
 def check_exif_tool(msgstream=sys.stderr):
     """Tests if a compatible version of exiftool is available."""
+    '''
     try:
         output = su.execandcombine((EXIFTOOL, "-ver"))
         version = float(output)
@@ -193,8 +196,11 @@ the new -X option to read IPTC data in XML format."""
 Make sure you have exiftool installed as /usr/bin/exiftool. You can download a
 copy from http://www.sno.phy.queensu.ca/~phil/exiftool/.
 """ % (EXIFTOOL)
+    '''
+    # TODO FOR THE MOMENT LETS SUPPOSE EXIF TOOL IS NEVER AVAILABLE
     return False
 
+'''
 def _get_xml_nodevalues(xml_data, tag, data):
     """Extracts one or more node values from an XML element, and appends
        it to the data array. Node values can be directly below the element,
@@ -507,4 +513,4 @@ def _write_caption_file(new_caption, command):
     command.append('-Caption-Abstract<=%s' % (tmp))
     command.append('-ImageDescription<=%s' % (tmp))
     return tmp
-    
+'''

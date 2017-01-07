@@ -30,6 +30,7 @@ from Carbon.File import FSResolveAliasFile
 
 _sysenc = sys.getfilesystemencoding()
 
+'''
 class _NullHandler(logging.Handler):
     def emit(self, record):
         pass
@@ -37,6 +38,7 @@ class _NullHandler(logging.Handler):
 _logger = logging.getLogger("google.systemutils")
 _logger.addHandler(_NullHandler())
 
+'''
 def resolve_alias(path):
     """Resolves a path to point to the real file if it is a file system alias.
     """
@@ -46,7 +48,8 @@ def resolve_alias(path):
     except (OSError, MacOS.Error) as ose:
         pout(u"Failed to resolve alias for %s." % (path))
         return path
-        
+
+'''
 def execandcombine(command):
     """execute a shell command, and return all output in a single string."""
     data = execandcapture(command)
@@ -83,6 +86,7 @@ def equalscontent(string1, string2):
     if not string2:
         string2 = ""
     return string1.strip() == string2.strip()
+'''
 
 def nn_string(value):
     """Returns a string that will be None (replaced by '')."""
@@ -131,13 +135,15 @@ def pout(msg):
     except UnicodeError, e:
         print '%s (ignored)' % str(e)
          
+"""
 def perr(msg):
     '''Prints a message to sys.stderr, taking care of character encodings.'''
     try:
         print >> sys.stderr, fsenc(msg)
     except UnicodeError, e:
         print >> sys.stderr, '%s (ignored)' % str(e)
-         
+"""
+
 def getfilebasename(file_path):
     """returns the name of a file, without the extension. "/a/b/c.txt" -> "c".
     """
@@ -151,11 +157,11 @@ def getfileextension(file_path):
         ext = ext[1:]
     return ext.lower()
 
-
+'''
 def issamefile(file1, file2):
     """Tests if the two files have the same contents."""
     return filecmp.cmp(file1, file2, False)
-
+'''
 
 def expand_home_folder(path):
     """Checks if path starts with ~ and expands it to the actual

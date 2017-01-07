@@ -28,6 +28,7 @@ import threading
 import tkFileDialog
 import tkMessageBox
 import traceback
+import unicodedata
 
 # pylint: disable-msg=W0614
 from Tkinter import *  #IGNORE:W0401
@@ -167,7 +168,7 @@ class ExportApp(Frame):
         self.delete_var = IntVar()
         self.originals_var = IntVar()
         self.link_var = IntVar()
-        self.folder_hints_var = IntVar()
+
         self.faces_box = None
         self.faces_var = IntVar()
         self.face_keywords_box = None
@@ -194,12 +195,11 @@ class ExportApp(Frame):
         _logger.addHandler(self.logging_handler)
 
     def __aboutHandler(self):
-        HelpDialog(self, """%s %s
+        HelpDialog(self, """%s
 
   Copyright 2012 Google Inc.
 
-http://code.google.com/p/phoshare""" % (phoshare_version.PHOSHARE_VERSION,
-	phoshare_version.PHOSHARE_BUILD),
+http://code.google.com/p/phoshare""" % (phoshare_version.PHOSHARE_VERSION,),
                    title="About Phoshare")
 
     def init(self):
@@ -233,7 +233,6 @@ http://code.google.com/p/phoshare""" % (phoshare_version.PHOSHARE_VERSION,
         self.delete_var.set(_int_from_bool(options.delete))
         self.originals_var.set(_int_from_bool(options.originals))
         self.link_var.set(_int_from_bool(options.link))
-        self.folder_hints_var.set(_int_from_bool(options.folderhints))
         self.faces_var.set(_int_from_bool(options.faces) and self.exiftool)
         self.face_keywords_var.set(_int_from_bool(options.face_keywords) and
                                    self.exiftool)
@@ -352,9 +351,6 @@ http://code.google.com/p/phoshare""" % (phoshare_version.PHOSHARE_VERSION,
         originals_box = Checkbutton(lf, text="Export originals",
                                     var=self.originals_var)
         originals_box.grid(row=2, column=1, sticky=W)
-        hint_box = Checkbutton(lf, text="Use folder hints",
-                               var=self.folder_hints_var)
-        hint_box.grid(row=3, column=1, sticky=W)
 
         delete_box = Checkbutton(lf, text="Delete obsolete pictures",
                                  var=self.delete_var)
@@ -701,6 +697,7 @@ Metadata options will be disabled if exiftool is not available.""")
         self.run_export(False)
 
     def do_dryrun(self):
+        '''
         if self.active_library:
             self.stop_thread()
             return
@@ -709,6 +706,7 @@ Metadata options will be disabled if exiftool is not available.""")
         self.dryrun_button.config(text="Stop Dry Run")
         self.export_button.config(state=DISABLED)
         self.run_export(True)
+        '''
 
     def stop_thread(self):
         if self.active_library:
@@ -730,7 +728,6 @@ Metadata options will be disabled if exiftool is not available.""")
             self.albums = ''
             self.events = '.'
             self.smarts = ''
-            self.ignore = []
             self.delete = False
             self.update = False
             self.max_create = -1
@@ -738,16 +735,9 @@ Metadata options will be disabled if exiftool is not available.""")
             self.max_update = -1
             self.link = False
             self.dryrun = False
-            self.folderhints = False
-            self.folderpatterns = None
             self.captiontemplate = u'{description}'
             self.foldertemplate = u'{name}'
             self.nametemplate = u'{title}'
-            self.aperture = False # TODO
-            self.reverse = False # TODO
-            self.size = ''  # TODO
-            self.picasa = False  # TODO
-            self.movies = True  # TODO
             self.originals = False
             self.iptc = 0
             self.iptc_masters = False # TODO
@@ -789,20 +779,10 @@ Metadata options will be disabled if exiftool is not available.""")
                 self.update = config.getboolean(s, 'update')
             if config.has_option(s, 'link'):
                 self.link = config.getboolean(s, 'link')
-            if config.has_option(s, 'folderhints'):
-                self.folderhints = config.getboolean(s, 'folderhints')
             if config.has_option(s, 'captiontemplate'):
                 self.nametemplate = unicode(config.get(s, 'captiontemplate'))
             if config.has_option(s, 'nametemplate'):
                 self.nametemplate = unicode(config.get(s, 'nametemplate'))
-            if config.has_option(s, 'reverse'):
-                self.reverse = config.getboolean(s, 'reverse')
-            if config.has_option(s, 'size'):
-                self.size = config.get(s, 'size')
-            if config.has_option(s, 'picasa'):
-                self.picasa = config.getboolean(s, 'picasa')
-            if config.has_option(s, 'movies'):
-                self.movies = config.getboolean(s, 'movies')
             if config.has_option(s, 'originals'):
                 self.originals = config.getboolean(s, 'originals')
             if config.has_option(s, 'iptc'):
@@ -839,13 +819,8 @@ Metadata options will be disabled if exiftool is not available.""")
             config.set(s, 'max_udpate', self.max_update)
             config.set(s, 'link', self.link)
             config.set(s, 'dryrun', self.dryrun)
-            config.set(s, 'folderhints', self.folderhints)
             config.set(s, 'captiontemplate', self.captiontemplate)
             config.set(s, 'nametemplate', self.nametemplate)
-            config.set(s, 'reverse', self.reverse)
-            config.set(s, 'size', self.size)
-            config.set(s, 'picasa', self.picasa)
-            config.set(s, 'movies', self.movies)
             config.set(s, 'originals', self.originals)
             config.set(s, 'iptc', self.iptc)
             config.set(s, 'gps', self.gps)
@@ -898,21 +873,13 @@ Metadata options will be disabled if exiftool is not available.""")
         try:
             # First, load the iPhoto library.
             library_path = su.expand_home_folder(self.iphoto_library.get())
-            album_xml_file = None
+            data = None
             try:
-                album_xml_file = iphotodata.get_album_xmlfile(library_path)
-            except ValueError, e:
-                self.thread_queue.put(("done", (False, mode, str(e))))
-                return
-            
-            album_sql_file = None
-            try:
-                album_sql_file = iphotodata.get_album_sqlfile(library_path)
+                data = iphotodata.get_iphoto_data(library_path)
             except ValueError, e:
                 self.thread_queue.put(("done", (False, mode, str(e))))
                 return
 
-            data = iphotodata.get_iphoto_data(album_xml_file, album_sql_file)
             msg = "Version %s library with %d images" % (
                 data.applicationVersion, len(data.images))
             self.write(msg + '\n')
@@ -951,7 +918,6 @@ Metadata options will be disabled if exiftool is not available.""")
             if options.captiontemplate:
                 args.extend(['--captiontemplate', '"' +
                              options.captiontemplate + '"'])
-            options.ignore = []  # TODO
             options.update = self.update_var.get() == 1
             if options.update:
                 args.append('--update')
@@ -964,9 +930,6 @@ Metadata options will be disabled if exiftool is not available.""")
             options.link = self.link_var.get() == 1
             if options.link:
                 args.append('--link')
-            options.folderhints = self.folder_hints_var.get() == 1
-            if options.folderhints:
-                args.append('--folderhints')
             options.faces = self.faces_var.get() == 1
             if options.faces:
                 args.append('--faces')
@@ -994,16 +957,12 @@ Metadata options will be disabled if exiftool is not available.""")
             if options.verbose:
                 args.append('--verbose')
 
-            exclude = None # TODO
-
             options.save()
             print " ".join(args)
 
             self.logging_handler.setLevel(logging.DEBUG if options.verbose else logging.INFO)
-	    if options.originals and options.export:
-		data.load_aperture_originals()
             self.active_library = phoshare_main.ExportLibrary(export_folder)
-            phoshare_main.export_iphoto(self.active_library, data, exclude,
+            phoshare_main.export_iphoto(self.active_library, data,
                                         options)
             self.thread_queue.put(("done", (True, mode, '')))
 
@@ -1055,12 +1014,13 @@ Metadata options will be disabled if exiftool is not available.""")
         and can be called from a non-UI thread."""
         self.thread_queue.put(("write", text))
 
+    '''
     def writelines(self, lines):  # lines already have '\n'
         """Writes text to the progress area of the UI. Uses the thread queue,
         and can be called from a non-UI thread."""
         for line in lines:
             self.write(line)
-
+    '''
 
 def main():
     """Main routine for phoshare_ui. Typically launched from Phoshare.py"""

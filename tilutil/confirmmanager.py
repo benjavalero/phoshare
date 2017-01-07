@@ -8,7 +8,7 @@ class ConfirmManager:
     '''Class to prompt user for file operation confirmations, and remember the 
        patterns for future prompts.
     '''
-
+    """
     def __init__(self):
         self.approve_list = []
         self.reject_list = []
@@ -65,3 +65,4 @@ class ConfirmManager:
             if first_char == choices[c]:
                 return c
         return 0
+    """

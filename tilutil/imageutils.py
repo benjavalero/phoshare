@@ -25,6 +25,7 @@ import sys
 import tilutil.systemutils as su
 import unicodedata
 
+'''
 # ImageMagick "convert" tool. Obsolete - should use _SIPS_TOOL only.
 CONVERT_TOOL = "convert"
 
@@ -38,6 +39,7 @@ _IGNORE_LIST = ("pspbrwse.jbf", "thumbs.db", "desktop.ini",
                 "albumdata.xml", "albumdata2.xml", "pkginfo", "imovie data",
                 "dir.data", "iphoto.ipspot", "iphotolock.data", "library.data",
                 "library.iphoto", "library6.iphoto", "caches")
+'''
 
 class _NullHandler(logging.Handler):
     """A logging handler that doesn't emit anything."""
@@ -47,6 +49,7 @@ class _NullHandler(logging.Handler):
 _logger = logging.getLogger("google.imageutils")
 _logger.addHandler(_NullHandler())
 
+'''
 def check_convert():
     """Tests if ImageMagick convert tool is available. Prints error message
        to sys.stderr if there is a problem."""
@@ -66,6 +69,7 @@ from http://www.imagemagick.org/script/index.php
 """ % (CONVERT_TOOL)
         return False
     return True
+'''
 
 def should_create(options):
     """Returns True if a create should be performed, based on options. Does not
@@ -105,6 +109,7 @@ def should_update(options):
         options.max_update -= 1
     return True
 
+'''
 def is_ignore(file_name):
     """returns True if the file name is in a list of names to ignore."""
     if file_name.startswith("."):
@@ -114,6 +119,7 @@ def is_ignore(file_name):
         return True
     name = file_name.lower()
     return name in _IGNORE_LIST
+'''
 
 def make_foldername(name):
     """Returns a valid folder name by replacing problematic characters."""
@@ -141,6 +147,7 @@ def make_image_filename(name):
             result += ' '
     return unicodedata.normalize("NFC", result)
 
+'''
 def is_image_file(file_name):
     """Tests if the file (name or full path) is an image file."""
     return su.getfileextension(file_name) in ("jpg", "jpeg", "tif", "png",
@@ -419,6 +426,7 @@ def get_photo_caption(photo, container, caption_template):
         su.pout(u'Unrecognized field in caption template: %s. Use one of: title, description, '
                 'title_description, yyyy, mm, dd.' % (str(ex)))
         return caption_template
+'''
 
 _YEAR_PATTERN_INDEX = re.compile(r'([0-9][0-9][0-9][0-9]) (.*)')
 
@@ -532,16 +540,14 @@ def format_photo_name(photo, album_name, index, padded_index,
     # Take out invalid characters, like '/'
     return make_image_filename(formatted_name)
 
-def copy_or_link_file(source, target, dryrun=False, link=False, size=None,
+def copy_or_link_file(source, target, dryrun=False, link=False,
                       options=None):
-    """copies, links, or converts an image file.
+    """copies or links an image file.
 
     Returns: True if the file exists.
     """
     try:
-        if size:
-            mode = " (resize)"
-        elif link:
+        if link:
             mode = " (link)"
         else:
             mode = " (copy)"
@@ -560,11 +566,6 @@ def copy_or_link_file(source, target, dryrun=False, link=False, size=None,
         if link:
             _logger.debug(u'os.link(%s, %s)', source, target)
             os.link(source, target)
-        elif size:
-            result = resize_image(source, target, size)
-            if result:
-                _logger.error(u'%s: %s' % (source, result))
-                return False
         else:
             _logger.debug(u'shutil.copy2(%s, %s)', source, target)
             shutil.copy2(source, target)
@@ -573,6 +574,7 @@ def copy_or_link_file(source, target, dryrun=False, link=False, size=None,
         _logger.error(u'%s: %s' % (source, str(ex)))
     return False
 
+'''
 def get_missing_face_keywords(iptc_data, face_list=None):
     """Checks if keywords need to be added for faces. Returns the keywords that need
        to be added."""
@@ -667,4 +669,4 @@ def _strip_old_names(caption, names):
     new_caption = caption[:start].strip()
     # Do it recursively in case we've added extra (...) sections before
     return _strip_old_names(new_caption, names)
-
+'''
