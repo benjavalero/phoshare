@@ -700,7 +700,6 @@ Exports images and movies from an iPhoto library into a folder.
 Launches as an application if no options are specified.
 """
 
-'''
 def get_option_parser():
     """Gets an OptionParser for the Phoshare command line tool options."""
     p = OptionParser(usage=USAGE)
@@ -775,9 +774,6 @@ def get_option_parser():
     p.add_option("--ratings",
                  help="""Only export pictures with matching rating (comma separate list)""")
     p.add_option(
-      "--size", type='int', help="""Resize images so that neither width or
-      height exceeds this size. Converts all images to jpeg.""")
-    p.add_option(
         "-s", "--smarts",
         help="""Export matching smart albums. The argument
         is a regular expression. Use -s . to export all smart albums.""")
@@ -797,8 +793,7 @@ def run_phoshare(cmd_args):
         parser.error("Found some unrecognized arguments on the command line.")
 
     if options.version:
-        print '%s %s' % (phoshare.phoshare_version.PHOSHARE_VERSION,
-                         phoshare.phoshare_version.PHOSHARE_BUILD)
+        print '%s' % (phoshare.phoshare_version.PHOSHARE_VERSION,)
         return 1
 
     if options.iptc > 0 and not exiftool.check_exif_tool():
@@ -845,4 +840,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-'''
