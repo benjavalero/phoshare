@@ -202,7 +202,7 @@ class ExportFile(object):
 
         do_iptc = (options.iptc == 1 and
                    do_original_export) or options.iptc == 2
-        if do_iptc and (options.link or options.iptc_masters):
+        if do_iptc and options.link:
             if self.check_iptc_data(original_source_file, options,
                                     is_original=True, file_updated=do_original_export):
                 do_original_export = True
@@ -752,9 +752,6 @@ def get_option_parser():
         help="""Check the IPTC data of all files. Checks for
         keywords and descriptions. Requires the program "exiftool" (see
         http://www.sno.phy.queensu.ca/~phil/exiftool/).""")
-    p.add_option("--iptc_masters",
-                 action="store_true",
-                 help="""Check and update IPTC data in the master files in the library.""")
     p.add_option(
       "-l", "--link", action="store_true",
       help="""Use links instead of copying files. Use with care, as changes made
@@ -771,8 +768,6 @@ def get_option_parser():
       help="""Template for naming image files. Default: "{title}".""")
     p.add_option("-o", "--originals", action="store_true",
                       help="Export original files into Originals.")
-    p.add_option("--ratings",
-                 help="""Only export pictures with matching rating (comma separate list)""")
     p.add_option(
         "-s", "--smarts",
         help="""Export matching smart albums. The argument
@@ -815,16 +810,12 @@ def run_phoshare(cmd_args):
         parser.error("No action specified. Use --export to export from your "
                      "iPhoto library.")
 
-    if options.ratings:
-        options.ratings = [int(r) for r in options.ratings.split(",")]
-
     logging_handler = logging.StreamHandler()
     logging_handler.setLevel(logging.DEBUG if options.verbose else logging.INFO)
     _logger.addHandler(logging_handler)
 
     photos_library_dir = su.expand_home_folder(options.iphoto)
-    data = iphotodata.get_iphoto_data(photos_library_dir, ratings=options.ratings,
-                                       verbose=options.verbose)
+    data = iphotodata.get_iphoto_data(photos_library_dir, verbose=options.verbose)
 
     options.foldertemplate = unicode(options.foldertemplate)
     options.nametemplate = unicode(options.nametemplate)

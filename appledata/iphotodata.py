@@ -104,7 +104,7 @@ def parse_face_rectangle(string_data):
 class IPhotoData(object):
     """top level iPhoto data node."""
 
-    def __init__(self, photos_dict, ratings):
+    def __init__(self, photos_dict):
         """# call with results of readAppleXML."""
         self.data = photos_dict
 
@@ -139,10 +139,9 @@ class IPhotoData(object):
 
         album_data = self.data.get("List of Albums")
 
-        self.root_album = IPhotoContainer("", "Root", None, None, None)
+        self.root_album = IPhotoContainer("", "Root", None, None)
         for data in album_data:
-            album = IPhotoAlbum(data, self.images_by_id, ratings, self.albums,
-                                self.root_album)
+            album = IPhotoAlbum(data, self.images_by_id, self.albums, self.root_album)
             self.albums[album.albumid] = album
 
         """
@@ -489,7 +488,7 @@ class IPhotoImage(object):
 class IPhotoContainer(object):
     """Base class for IPhotoAlbum and IPhotoRoll."""
 
-    def __init__(self, name, albumtype, data, images, ratings, verbose=False):
+    def __init__(self, name, albumtype, data, images):
         self.name = name
 
         '''
@@ -510,8 +509,7 @@ class IPhotoContainer(object):
 
         # TODO Convert Photos numeric album types to type names.
         if not albumtype:
-            if verbose:
-                su.pout(u'No album type for %s.' % name)
+            su.pout(u'No album type for %s.' % name)
         self.albumtype = albumtype
         self.data = data
 
@@ -535,16 +533,10 @@ class IPhotoContainer(object):
                     continue
                 image = images.get(key)
                 if image:
-                    '''
-                    if ratings and not image.rating in ratings:
-                        continue
-                    '''
                     self.images.append(image)
                 else:
                     hidden += 1
-                    if verbose:
-                        su.pout(u"%s: image with id %s does not exist - could be hidden." % (name,
-                                                                                             key))
+                    su.pout(u"%s: image with id %s does not exist - could be hidden." % (name, key))
         
         if hidden:
             su.pout(u"%s: %d images not exported (probably hidden)." % (name, hidden))
@@ -632,10 +624,10 @@ class IPhotoContainer(object):
 class IPhotoAlbum(IPhotoContainer):
     """Describes an iPhoto Album."""
 
-    def __init__(self, data, images, ratings, album_map, root_album):
+    def __init__(self, data, images, album_map, root_album):
         IPhotoContainer.__init__(self, data.get("AlbumName"),
                                  data.get("Album Type") if data.has_key("Album Type") else "Regular",
-                                 data, images, ratings)
+                                 data, images)
         self.albumid = data.get("AlbumId")
 
         # TODO NO SE QUE SIGNIFICA ESTA PROPIEDAD "MASTER"
@@ -683,14 +675,14 @@ class IPhotoFace(object):
         return "%s (%s)" % (self.name, self.albumtype)
 '''
 
-def get_iphoto_data(photos_library_dir, ratings=None, verbose=False):
+def get_iphoto_data(photos_library_dir, verbose=False):
     """reads the iPhoto database and converts it into an iPhotoData object."""
     if verbose:
         print "Reading %s database from %s..." % ('Photos', photos_library_dir)
 
     photos_dict = applexml.read_apple_library(photos_library_dir)
 
-    data = IPhotoData(photos_dict, ratings)
+    data = IPhotoData(photos_dict)
 
     if data.applicationVersion != 477:
         # Library version for El Capitan is 1021

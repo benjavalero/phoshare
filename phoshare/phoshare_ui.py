@@ -697,7 +697,6 @@ Metadata options will be disabled if exiftool is not available.""")
         self.run_export(False)
 
     def do_dryrun(self):
-        '''
         if self.active_library:
             self.stop_thread()
             return
@@ -706,7 +705,6 @@ Metadata options will be disabled if exiftool is not available.""")
         self.dryrun_button.config(text="Stop Dry Run")
         self.export_button.config(state=DISABLED)
         self.run_export(True)
-        '''
 
     def stop_thread(self):
         if self.active_library:
@@ -740,13 +738,11 @@ Metadata options will be disabled if exiftool is not available.""")
             self.nametemplate = u'{title}'
             self.originals = False
             self.iptc = 0
-            self.iptc_masters = False # TODO
             self.gps = False
             self.faces = False
             self.facealbums = False
             self.facealbum_prefix = ''
             self.face_keywords = False
-            self.ratings = '' # TODO
             self.verbose = False
 
         def load(self):
