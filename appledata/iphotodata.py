@@ -324,10 +324,10 @@ class IPhotoImage(object):
         self.comment = su.nn_string(data.get("Comment")).strip()
         '''
 
-        self.date = datetime.datetime.now() # TODO Get photo date
+        self.date = None
+        if data.has_key("ImageDate"):
+            self.date = data.get("ImageDate")
         '''
-        if data.has_key("DateAsTimerInterval"):
-            self.date = applexml.getappletime(data.get("DateAsTimerInterval"))
         else:
             # Try to get the date from a the caption in "YYYYMMDD ..." format
             m = re.match(_CAPTION_PATTERN, self._caption)
@@ -491,13 +491,10 @@ class IPhotoContainer(object):
         self.name = name
 
         '''
-        self._date = None
         self.uuid = None
         self.comment = None
 
         if data:
-            if data.get("RollDateAsTimerInterval"):
-                self._date = applexml.getappletime(data.get("RollDateAsTimerInterval"))
             if data.get("uuid"):
                 self.uuid = data.get("uuid")
                 if self.uuid == 'lastImportAlbum':
@@ -585,8 +582,7 @@ class IPhotoContainer(object):
         self.albums.append(album)
 
     def _getdate(self):
-        # TODO USED WHEN DATE TEMPLATE FOR FOLDER NAME. RETURN FOR EXAMPLE THE ALBUM MODIFICATION DATE.
-        return datetime.datetime.now()
+        return self.data.get("AlbumDate")
     date = property(_getdate, doc='date of container (based on oldest image)')
 
     '''

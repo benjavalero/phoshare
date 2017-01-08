@@ -456,10 +456,6 @@ def format_album_name(album, name, folder_template):
         year = ''
         month = ''
         day = ''
-
-    folderhint = album.getfolderhint()
-    if not folderhint:
-        folderhint = ''
     
     try:
         return folder_template.format(
@@ -468,13 +464,12 @@ def format_album_name(album, name, folder_template):
             ascii_name=ascii_name,
             plain_name=plain_name,
             nodate_album=nodate_name,
-            hint=folderhint,
             yyyy=year,
             mm=month,
             dd=day)
     except KeyError, ex:
         su.pout(u'Unrecognized field in folder template: %s. Use one of: name, ascii_name, '
-                'plain_name, hint, yyyy, mm, dd.' % (str(ex)))
+                'plain_name, yyyy, mm, dd.' % (str(ex)))
         return folder_template
 
     

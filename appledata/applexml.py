@@ -25,12 +25,11 @@ import datetime
 import unicodedata
 import os
 import sys
-from xml import sax
 import sqlite3
 
 import tilutil.systemutils as su
 
-"""
+
 APPLE_BASE = calendar.timegm((2001, 1, 1, 0, 0, 0, 0, 0, -1))
 APPLE_BASE2 = datetime.datetime.fromtimestamp(calendar.timegm((2001, 1, 1, 0, 0, 0)))
 
@@ -48,17 +47,6 @@ def getappletime(value):
     except (TypeError, ValueError) as _e:
         # bad time stamp in database, default to "now"
         return datetime.datetime.now()
-
-class AppleXMLResolver(sax.handler.EntityResolver): #IGNORE:W0232
-    '''Helper to deal with XML entity resolving'''
-
-    def __init__(self):
-        pass
-
-    def resolveEntity(self, _publicId, systemId): #IGNORE:C0103
-        '''Simple schema, resolve all entities to just the systemId'''
-        return systemId
-"""
 
 
 def get_photos_library_file(library_dir):
@@ -112,7 +100,7 @@ def read_apple_library(photos_library_dir):
         # Resources
         conn3 = sqlite3.connect(photos_imageproxies_file)
         c3 = conn3.cursor()
-        c3.execute('select attachedModelId, resource_uuid, filename from RKModelResource '
+        c3.execute('select attachedModelId, resourceUuid, filename from RKModelResource '
                    'where attachedModelType = 2 and resourceType = 4')
         resources_dict = {}
         for result in c3.fetchall():
@@ -141,14 +129,16 @@ def read_apple_library(photos_library_dir):
 
         # Albums
         c2 = conn2.cursor()
-        c2.execute('select modelId, uuid, name, folderUuid from RKAlbum where albumType = 1'
-                   ' and albumSubclass = 3 and isInTrash = 0 and isMagic = 0')
+        c2.execute('select modelId, uuid, name, folderUuid, recentUserChangeDate'
+                   ' from RKAlbum where albumType = 1 and albumSubclass = 3'
+                   ' and isInTrash = 0 and isMagic = 0')
         albums = []
         albums_by_id = {}
         for result in c2.fetchall():
             album_id = int(result[0])
             album_data = {}
             album_data['AlbumName'] = unicodedata.normalize("NFC", result[2])
+            album_data['AlbumDate'] = getappletime(result[4])
             album_data['KeyList'] = []
 
             # Load folder path
@@ -164,20 +154,33 @@ def read_apple_library(photos_library_dir):
                         folder_path = os.path.join(folder_path, parent_folder['name'])
                 album_data['FolderPath'] = folder_path
 
-            # TODO COMPLETE
             albums.append(album_data)
             albums_by_id[album_id] = album_data
         photos_dict['List of Albums'] = albums
 
+        # Versions
+        c2 = conn2.cursor()
+        c2.execute('select modelId, name from RKVersion where isInTrash = 0')
+        versions_dict = {}
+        for result in c2.fetchall():
+            model_id = int(result[0])
+            version_dict = {}
+            version_name = None
+            if result[1]:
+                version_name = unicodedata.normalize("NFC", result[1])
+            version_dict['VersionName'] = version_name
+            versions_dict[model_id] = version_dict
+
         # Masters
         c2 = conn2.cursor()
-        c2.execute('select modelId, uuid, image_path from RKMaster '
+        c2.execute('select modelId, uuid, imagePath, imageDate from RKMaster '
                    'where importComplete = 1 and isInTrash = 0')
         masters_dict = {}
         for result in c2.fetchall():
             model_id = int(result[0])
             master_dict = {}
-            master_dict['image_path'] = result[2]
+            master_dict['ImagePath'] = result[2]
+            master_dict['ImageDate'] = getappletime(result[3])
             masters_dict[model_id] = master_dict
 
         # Images
@@ -186,7 +189,6 @@ def read_apple_library(photos_library_dir):
             image_data = {}
             if master_id in resources_dict:
                 resource_dict = resources_dict[master_id]
-                image_data['Caption'] = None  # TODO
                 resource_uuid = resource_dict['resource_uuid']
                 folder1 = str(ord(resource_uuid[0]))
                 folder2 = str(ord(resource_uuid[1]))
@@ -195,10 +197,11 @@ def read_apple_library(photos_library_dir):
                                                        folder1, folder2, resource_uuid, filename)
             else:
                 master_dict = masters_dict[master_id]
-                image_data['Caption'] = None  # TODO
-                image_path = master_dict['image_path']
+                image_path = master_dict['ImagePath']
                 image_data['ImagePath'] = os.path.join(photos_library_dir, 'Masters', image_path)
-            # TODO COMPLETE
+            image_data['ImageDate'] = master_dict['ImageDate']
+            version_dict = versions_dict[master_id]
+            image_data['Caption'] = version_dict['VersionName']
             images[master_id] = image_data
         photos_dict['Master Image List'] = images
 
