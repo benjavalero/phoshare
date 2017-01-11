@@ -114,7 +114,7 @@ def read_apple_library(photos_library_dir):
         # Folders
         conn2 = sqlite3.connect(photos_library_file)
         c2 = conn2.cursor()
-        c2.execute('select uuid, modelId, name, parentFolderUuid, folderPath from RKFolder '
+        c2.execute('select uuid, modelId, name, folderPath from RKFolder '
                    'where folderType = 1 and isInTrash = 0 and isMagic = 0')
         folders_by_id = {}
         folders_by_uuid = {}
@@ -123,13 +123,13 @@ def read_apple_library(photos_library_dir):
             model_id = int(result[1])
             folder_dict = {}
             folder_dict['name'] = result[2]
-            folder_dict['folderPath'] = result[4]
+            folder_dict['folderPath'] = result[3]
             folders_by_uuid[uuid] = folder_dict
             folders_by_id[model_id] = folder_dict
 
         # Albums
         c2 = conn2.cursor()
-        c2.execute('select modelId, uuid, name, folderUuid, recentUserChangeDate'
+        c2.execute('select modelId, name, folderUuid, recentUserChangeDate'
                    ' from RKAlbum where albumType = 1 and albumSubclass = 3'
                    ' and isInTrash = 0 and isMagic = 0')
         albums = []
@@ -137,13 +137,13 @@ def read_apple_library(photos_library_dir):
         for result in c2.fetchall():
             album_id = int(result[0])
             album_data = {}
-            album_data['AlbumName'] = unicodedata.normalize("NFC", result[2])
-            album_data['AlbumDate'] = getappletime(result[4])
+            album_data['AlbumName'] = unicodedata.normalize("NFC", result[1])
+            album_data['AlbumDate'] = getappletime(result[3])
             album_data['KeyList'] = []
 
             # Load folder path
             album_data['FolderPath'] = None
-            album_folder_uuid = result[3]
+            album_folder_uuid = result[2]
             if album_folder_uuid in folders_by_uuid:
                 album_folder = folders_by_uuid[album_folder_uuid]
                 parent_folder_ids = album_folder['folderPath']
@@ -160,7 +160,7 @@ def read_apple_library(photos_library_dir):
 
         # Versions
         c2 = conn2.cursor()
-        c2.execute('select modelId, name from RKVersion where isInTrash = 0')
+        c2.execute('select modelId, name, imageDate, createDate from RKVersion where isInTrash = 0')
         versions_dict = {}
         for result in c2.fetchall():
             model_id = int(result[0])
@@ -169,18 +169,21 @@ def read_apple_library(photos_library_dir):
             if result[1]:
                 version_name = unicodedata.normalize("NFC", result[1])
             version_dict['VersionName'] = version_name
+            if result[2]:
+                version_dict['VersionDate'] = getappletime(result[2])
+            else:
+                version_dict['VersionDate'] = getappletime(result[3])
             versions_dict[model_id] = version_dict
 
         # Masters
         c2 = conn2.cursor()
-        c2.execute('select modelId, uuid, imagePath, imageDate from RKMaster '
+        c2.execute('select modelId, imagePath from RKMaster '
                    'where importComplete = 1 and isInTrash = 0')
         masters_dict = {}
         for result in c2.fetchall():
             model_id = int(result[0])
             master_dict = {}
-            master_dict['ImagePath'] = result[2]
-            master_dict['ImageDate'] = getappletime(result[3])
+            master_dict['ImagePath'] = result[1]
             masters_dict[model_id] = master_dict
 
         # Images
@@ -199,9 +202,9 @@ def read_apple_library(photos_library_dir):
                 master_dict = masters_dict[master_id]
                 image_path = master_dict['ImagePath']
                 image_data['ImagePath'] = os.path.join(photos_library_dir, 'Masters', image_path)
-            image_data['ImageDate'] = master_dict['ImageDate']
             version_dict = versions_dict[master_id]
             image_data['Caption'] = version_dict['VersionName']
+            image_data['ImageDate'] = version_dict['VersionDate']
             images[master_id] = image_data
         photos_dict['Master Image List'] = images
 
