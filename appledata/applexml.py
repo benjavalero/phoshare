@@ -1,7 +1,8 @@
-'''Reads iPhoto or iTunes XML data files'''
+'''Reads Photo SQLite database'''
 
 # Original work Copyright 2010 Google Inc.
 # Modified work Copyright 2014 Luke Hagan
+# Modified work Copyright 2017 Benjamín Valero
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -15,10 +16,10 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-# Modifications to original source by Luke Hagan:
+# Modifications to original source:
 #
 #   2014-06-04: retrieve keywords from iPhoto database using sqlite
-#
+#   2017-01-14: retrieve all necessary data entirely from Photos SQLite database
    
 import calendar
 import datetime
@@ -40,7 +41,7 @@ def getappletime(value):
         # datetime.datetime.fromtimestamp() takes only int, which limits it to 12/13/1901
         # as the earliest possible date. Use an alternate calculation for earlier dates.
         # This one however adjusts for daylight savings time, so summer times are off by an
-        # hour from the time recorded in iPhoto.
+        # hour from the time recorded in Photos.
         if APPLE_BASE + float(value) < -sys.maxint:
             return APPLE_BASE2 + datetime.timedelta(seconds=float(value))
         return datetime.datetime.fromtimestamp(APPLE_BASE + float(value))

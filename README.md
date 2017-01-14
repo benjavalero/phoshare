@@ -1,16 +1,37 @@
 # Notice
 
-Due to Apple's discontinuation of iPhoto in favor of the new Photos app, I'm no longer maintaining this fork of phoshare.
+After Apple's discontinuation of iPhoto in favor of the new Photos app, I have made a fork of phoshare and adapted it so it can work with Photos.
 
 # Overview
 
-`phoshare` allows you to export and synchronize your iPhoto library to a folder tree. It preserves both the original and modified image, your event and album organization, and applies your iPhoto titles, descriptions, keywords, face tags, face rectangles, places, and ratings to the IPTC/EXIF metadata of your images. You can export a full copy of your library, or just build a tree of linked images that require very little additional disk space. You can re-run `phoshare` at any time to synchronize any changes made in iPhoto to your export tree quickly. `phoshare` works well with file-system based photo management tools like Picasa, Adobe Bridge, or Windows Live Photo Gallery.
+`phoshare` allows you to export and synchronize your Photos library to a folder tree. It preserves both the original and modified image, your folder and album organization, and applies your Photos titles, descriptions, keywords, face tags, face rectangles, places, and ratings to the IPTC/EXIF metadata of your images. You can export a full copy of your library, or just build a tree of linked images that require very little additional disk space. You can re-run `phoshare` at any time to synchronize any changes made in Photos to your export tree quickly.
 
 [Dan Warne](http://danwarne.com/) has written a blog post on [how to back up your iPhoto library to Dropbox](http://danwarne.com/backup-iphoto-library-dropbox-resize-images-save-space-2/) with `phoshare`.
 
 `phoshare` is written in Python, and is easily customizable by just editing the Python scripts.
 
-This fork is intended to revive `phoshare` as the original author [discontinued development](https://groups.google.com/forum/?fromgroups=#!topic/phoshare-users/moWsMcD5SdQ) in late 2012. It's meant for use with the latest version of iPhoto (9.5.1 as of this writing). It also drops Aperture support for the sake of simplicity (and because I don't have Aperture). For older versions of iPhoto and any version of Aperture, please use an earlier version from the original [project](https://code.google.com/p/phoshare/downloads/list).
+This fork is intended to revive `phoshare` as the original author [discontinued development](https://groups.google.com/forum/?fromgroups=#!topic/phoshare-users/moWsMcD5SdQ) in late 2012. It's meant for use with the latest version of Photos (1.0.1 as of this writing). For any version of iPhoto or Aperture, please use an earlier version from the original [project](https://code.google.com/p/phoshare/downloads/list).
+
+# TO-DO
+
+The adaptation to Photos library is still in progress, although the main features already work. Please take into account there is no documentation available about the Photos library structure, all of it has been figured out by reverse-engineering.
+
+There still some disabled features and possible issues:
+
+- [ ] Export originals
+- [ ] Take into account other album types, like smart or iCloud albums.
+- [ ] Export also the images hanging from the root album.
+- [ ] Use the olde feature to filter events to filter album folders.
+- [ ] Enable metadata export.
+- [ ] Enable face albums export, in case these stil exist.
+- [ ] Fix Python PEP8 and Code Inspections.
+- [ ] Clean-up entirely the code once the old features are all restored or completely discarded.
+- [ ] Fix issue if the Photos library path contains non-Ascii characters.
+- [ ] Fix issue if the export path contains non-Ascii characters.
+- [ ] Test what happens if the image filename to export contains non-Ascii characters.
+- [ ] When exporting try to keep in the filesystem to file dates equal to the image date.
+- [ ] Test what happens when importing to Photos an old image without metadata, and thus with no image date.
+- [ ] Test the current behaviour when exporting metadata (when enabled) if the export file is a hard link.
 
 # Documentation
 
@@ -20,6 +41,7 @@ For now, use the original [Documentation](https://sites.google.com/site/phoshare
 
 Original work Copyright 2010 Google Inc.
 Modified work Copyright 2014 Luke Hagan
+Modified work Copyright 2017 Benjamín Valero
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.

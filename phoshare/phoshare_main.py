@@ -1,8 +1,9 @@
 #!/usr/bin/env python
-"""Reads iPhoto library info, and exports photos and movies."""
+"""Reads Photos library info, and exports photos and movies."""
 
 # Original work Copyright 2010 Google Inc.
 # Modified work Copyright 2014 Luke Hagan
+# Modified work Copyright 2017 Benjamín Valero
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -16,9 +17,10 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-# Modifications to original source by Luke Hagan:
+# Modifications to original source:
 #
 #   2014-06-04: retrieve keywords from iPhoto database using sqlite
+#   2017-01-14: retrieve all necessary data entirely from Photos SQLite database
 #
 
 import getpass
@@ -155,7 +157,7 @@ class ExportFile(object):
                      time.ctime(os.path.getmtime(source_file))))
             return True
 
-        # With creative renaming in iPhoto it is possible to get
+        # With creative renaming in Photos it is possible to get
         # stale files if titles get swapped between images. Double
         # check the size, allowing for some difference for meta data
         # changes made in the exported copy
@@ -560,7 +562,7 @@ class ExportLibrary(object):
 
     def process_albums(self, albums, album_types, folder_prefix, includes,
                        options):
-        """Walks trough an iPhoto album tree, and discovers albums
+        """Walks trough an Photos album tree, and discovers albums
            (directories)."""
         include_pattern = re.compile(su.unicode_string(includes))
 
@@ -661,9 +663,9 @@ class ExportLibrary(object):
 
 
 def export_iphoto(library, data, options):
-    """Main routine for exporting iPhoto images."""
+    """Main routine for exporting Photos images."""
 
-    print "Scanning iPhoto data for photos to export..."
+    print "Scanning Photos data for photos to export..."
     if options.events:
         library.process_albums(data.root_album.albums, ["Event"], u'',
                                options.events, options)
@@ -687,11 +689,11 @@ def export_iphoto(library, data, options):
     print "Scanning existing files in export folder..."
     library.load_album(options)
 
-    print "Exporting photos from iPhoto to export folder..."
+    print "Exporting photos from Photos to export folder..."
     library.generate_files(options)
 
 USAGE = """usage: %prog [options]
-Exports images and movies from an iPhoto library into a folder.
+Exports images and movies from an Photos library into a folder.
 
 Launches as an application if no options are specified.
 """
@@ -708,7 +710,7 @@ def get_option_parser():
         help='Template for IPTC image captions. Default: "{description}".')
     p.add_option(
         "-d", "--delete", action="store_true",
-        help="Delete obsolete files that are no longer in your iPhoto library.")
+        help="Delete obsolete files that are no longer in your Photos library.")
     p.add_option(
         "--dryrun", action="store_true",
         help="""Show what would have been done, but don't change or copy any
@@ -735,9 +737,9 @@ def get_option_parser():
     p.add_option("--gps", action="store_true",
                  help="Process GPS location information")
     p.add_option("--iphoto",
-                 help="""Path to iPhoto library, e.g.
+                 help="""Path to Photos library, e.g.
                  "%s/Pictures/iPhoto Library".""",
-                 default="~/Pictures/iPhoto Library")
+                 default="~/Pictures/iPhoto Library")   # TODO Adapt to Photos default
     p.add_option(
         "-k", "--iptc", action="store_const", const=1, dest="iptc",
         help="""Check the IPTC data of all new or updated files. Checks for
@@ -751,7 +753,7 @@ def get_option_parser():
     p.add_option(
       "-l", "--link", action="store_true",
       help="""Use links instead of copying files. Use with care, as changes made
-      to the exported files might affect the image that is stored in the iPhoto
+      to the exported files might affect the image that is stored in the Photos
       library.""")
     p.add_option("--max_create", type='int', default=-1,
                  help='Maximum number of images to create.')
@@ -790,7 +792,7 @@ def run_phoshare(cmd_args):
         return 1
 
     if not options.iphoto:
-        parser.error("Need to specify the iPhoto library with the --iphoto option.")
+        parser.error("Need to specify the Photos library with the --iphoto option.")
 
     if options.export:
         if not (options.albums or options.events or options.smarts or
@@ -800,7 +802,7 @@ def run_phoshare(cmd_args):
                          "options.")
     else:
         parser.error("No action specified. Use --export to export from your "
-                     "iPhoto library.")
+                     "Photos library.")
 
     logging_handler = logging.StreamHandler()
     logging_handler.setLevel(logging.DEBUG if options.verbose else logging.INFO)

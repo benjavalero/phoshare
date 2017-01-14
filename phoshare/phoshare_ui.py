@@ -1,7 +1,8 @@
-"""Reads iPhoto library info, and exports photos and movies. GUI version."""
+"""Reads Photos library info, and exports photos and movies. GUI version."""
 
 # Original work Copyright 2010 Google Inc.
 # Modified work Copyright 2014 Luke Hagan
+# Modified work Copyright 2017 Benjamín Valero
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -15,9 +16,10 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-# Modifications to original source by Luke Hagan:
+# Modifications to original source:
 #
 #   2014-06-04: retrieve keywords from iPhoto database using sqlite
+#   2017-01-14: retrieve all necessary data entirely from Photos SQLite database
 #
 
 import cStringIO
@@ -197,14 +199,16 @@ class ExportApp(Frame):
     def __aboutHandler(self):
         HelpDialog(self, """%s
 
-  Copyright 2012 Google Inc.
+    Copyright 2012 Google Inc.
+    Copyright 2014 Luke Hagan
+    Copyright 2017 Benjamín Valero
 
 http://code.google.com/p/phoshare""" % (phoshare_version.PHOSHARE_VERSION,),
                    title="About Phoshare")
 
     def init(self):
         """Initializes processing by launching background thread checker and
-           initial iPhoto library check."""
+           initial Photos library check."""
         self.thread_checker()
         if exiftool.check_exif_tool(sys.stdout):
             self.exiftool = True
@@ -296,7 +300,7 @@ http://code.google.com/p/phoshare""" % (phoshare_version.PHOSHARE_VERSION,),
         row += 1
         f.columnconfigure(1, weight=1)
 
-        Label(f, text="iPhoto Library:").grid(sticky=E)
+        Label(f, text="Photos Library:").grid(sticky=E)
         iphoto_library_entry = Entry(f, textvariable=self.iphoto_library)
         iphoto_library_entry.grid(row=0, column=1, sticky=E+W)
         self.browse_library_button = Button(f, text="Browse...",
@@ -676,7 +680,7 @@ Metadata options will be disabled if exiftool is not available.""")
         self.browse_library_button.config(state=NORMAL)
 
     def browse_library(self):
-        path = tkFileDialog.askopenfilename(title="Locate iPhoto Library")
+        path = tkFileDialog.askopenfilename(title="Locate Photos Library")
         if path:
             self.iphoto_library.set(path)
             self.check_iphoto_library()
@@ -720,7 +724,7 @@ Metadata options will be disabled if exiftool is not available.""")
         output in Phoshare.py."""
 
         def __init__(self):
-            self.iphoto = '~/Pictures/iPhoto Library'
+            self.iphoto = '~/Pictures/iPhoto Library'   # TODO Find standard path in English
             self.export = '~/Pictures/Album'
             self.albums = ''
             self.events = '.'
@@ -866,7 +870,7 @@ Metadata options will be disabled if exiftool is not available.""")
             mode - name of operation to run, "library", "dry_run", or "export".
         """
         try:
-            # First, load the iPhoto library.
+            # First, load the Photos library.
             library_path = su.expand_home_folder(self.iphoto_library.get())
             data = None
             try:

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Reads iPhoto library info, and exports photos and movies."""
+"""Reads Photos library info, and exports photos and movies."""
 
 # Copyright 2010 Google Inc.
 #

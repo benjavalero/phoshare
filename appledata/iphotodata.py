@@ -1,14 +1,14 @@
-'''iPhoto database: reads iPhoto database and parses it into albums and images.
+'''Photos database: reads Photos database and parses it into albums and images.
 
 @author: tsporkert@gmail.com
 
-This class reads iPhoto image, event, album information from the file
-AlbumData.xml in the iPhoto library directory. That file is written by iPhoto
-for the media browser in other applications. All data are
-organized in the class IPhotoData. Images in iPhoto are grouped using events
-(formerly knows as rolls) and albums. Each image is in exactly one event, and
-optionally, in zero or more albums. Albums can be nested (folders). The album
-types are:
+This class reads Photos image, album and folder information from the SQLite
+database in the Photos library directory. That file is written by Photo
+for the media browser in other applications. Images in Photos are grouped using
+albums and folders. An image may be in several albums (at least in the "root" album)
+and each album in a folder tree.
+
+The album types are:
 Flagged - flagged pictures
 Folder - contains other albums
 Published - an album published to MobileMe
@@ -26,6 +26,7 @@ None - should not really happen
 
 # Original work Copyright 2010 Google Inc.
 # Modified work Copyright 2014 Luke Hagan
+# Modified work Copyright 2017 Benjamín Valero
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -39,10 +40,11 @@ None - should not really happen
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-# Modifications to original source by Luke Hagan:
+# Modifications to original source:
 #
 #   2014-06-04: retrieve keywords from iPhoto database using sqlite;
 #               fix a bug in copying of originals
+#   2017-01-14: retrieve all necessary data entirely from Photos SQLite database
 #
 
 import datetime
@@ -102,7 +104,7 @@ def parse_face_rectangle(string_data):
 
 
 class IPhotoData(object):
-    """top level iPhoto data node."""
+    """top level Photos data node."""
 
     def __init__(self, photos_dict):
         """# call with results of readAppleXML."""
@@ -173,7 +175,7 @@ class IPhotoData(object):
 
     def _getapplicationversion(self):
         return self.data.get("Application Version")
-    applicationVersion = property(_getapplicationversion, doc='iPhoto version')
+    applicationVersion = property(_getapplicationversion, doc='Photos library version')
 
     def _getimages(self):
         return self.images_by_id.values()
@@ -312,7 +314,7 @@ _CAPTION_PATTERN = re.compile(
 '''
 
 class IPhotoImage(object):
-    """Describes an image in the iPhoto database."""
+    """Describes an image in the Photos database."""
 
     def __init__(self, key, data, keyword_map, face_map):
         '''
@@ -616,7 +618,7 @@ class IPhotoContainer(object):
 
 
 class IPhotoAlbum(IPhotoContainer):
-    """Describes an iPhoto Album."""
+    """Describes an Photos Album."""
 
     def __init__(self, data, images, album_map, root_album):
         IPhotoContainer.__init__(self, data.get("AlbumName"),
@@ -670,7 +672,7 @@ class IPhotoFace(object):
 '''
 
 def get_iphoto_data(photos_library_dir, verbose=False):
-    """reads the iPhoto database and converts it into an iPhotoData object."""
+    """reads the Photos database and converts it into an iPhotoData object."""
     if verbose:
         print "Reading %s database from %s..." % ('Photos', photos_library_dir)
 
