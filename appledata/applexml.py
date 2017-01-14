@@ -57,8 +57,8 @@ def get_photos_library_file(library_dir):
         photos_library_file = os.path.join(library_dir, "database", "Library.apdb")
         if os.path.exists(photos_library_file):
             return photos_library_file
-    raise ValueError, ("%s does not appear to be a valid Photos "
-                       "library location.") % library_dir
+    raise ValueError(("%s does not appear to be a valid Photos "
+                      "library location.") % library_dir)
 
 
 def get_photos_metaschema_file(library_dir):
@@ -67,8 +67,8 @@ def get_photos_metaschema_file(library_dir):
         photos_metaschema_file = os.path.join(library_dir, "database", "metaSchema.db")
         if os.path.exists(photos_metaschema_file):
             return photos_metaschema_file
-    raise ValueError, ("%s does not appear to be a valid Photos "
-                       "library location.") % library_dir
+    raise ValueError(("%s does not appear to be a valid Photos "
+                      "library location.") % library_dir)
 
 
 def get_photos_imageproxies_file(library_dir):
@@ -77,8 +77,8 @@ def get_photos_imageproxies_file(library_dir):
         photos_imageproxies_file = os.path.join(library_dir, "database", "ImageProxies.apdb")
         if os.path.exists(photos_imageproxies_file):
             return photos_imageproxies_file
-    raise ValueError, ("%s does not appear to be a valid Photos "
-                       "library location.") % library_dir
+    raise ValueError(("%s does not appear to be a valid Photos "
+                      "library location.") % library_dir)
 
 
 def read_apple_library(photos_library_dir):

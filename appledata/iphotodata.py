@@ -328,7 +328,7 @@ class IPhotoImage(object):
         '''
 
         self.date = None
-        if data.has_key("ImageDate"):
+        if "ImageDate" in data:
             self.date = data.get("ImageDate")
         '''
         else:
@@ -683,7 +683,7 @@ def get_iphoto_data(photos_library_dir, verbose=False):
 
     if data.applicationVersion != 477:
         # Library version for El Capitan is 1021
-        raise ValueError, "Photos library version %s has not been tested and it's not supported" % (
-            data.applicationVersion)
+        raise ValueError("Photos library version %s has not been tested and it's not supported" % (
+            data.applicationVersion))
 
     return data

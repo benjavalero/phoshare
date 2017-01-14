@@ -98,10 +98,11 @@ def delete_album_file(album_file, albumdirectory, msg, options):
         else:
             os.remove(album_file)
         return True
-    except OSError, ex:
+    except OSError as ex:
         print >> sys.stderr, "Could not delete %s: %s" % (su.fsenc(album_file),
                                                           ex)
     return False
+
 
 class ExportFile(object):
     """Describes an exported image."""
@@ -151,7 +152,7 @@ class ExportFile(object):
                 su.pout('Changed:  %s: inodes don\'t match: %d vs. %d' %
                         (self.export_file, export_stat.st_ino, source_stat.st_ino))
                 return True
-        if (os.path.getmtime(self.export_file) + _MTIME_FUDGE < os.path.getmtime(source_file)):
+        if os.path.getmtime(self.export_file) + _MTIME_FUDGE < os.path.getmtime(source_file):
             su.pout('Changed:  %s: newer version is available: %s vs. %s' %
                     (self.export_file,
                      time.ctime(os.path.getmtime(self.export_file)),
@@ -584,7 +585,7 @@ class ExportLibrary(object):
             
             # TODO check the album type
             if (sub_album.albumtype == "None" or
-                sub_album.albumtype not in album_types):
+                    sub_album.albumtype not in album_types):
                 # print "Ignoring " + sub_album.name + " of type " + \
                 # sub_album.albumtype
                 continue
@@ -599,16 +600,16 @@ class ExportLibrary(object):
             _logger.debug(u'Parent folders: %s', folder_hint)
 
             if folder_hint is not None:
-                isFolderMatch = False
+                is_folder_match = False
                 for parent_folder in folder_hint.split('/'):
                     if folder_pattern.match(parent_folder):
-                        isFolderMatch = True
+                        is_folder_match = True
                         break
-                if not isFolderMatch:
+                if not is_folder_match:
                     _logger.debug(u'Skipping "%s" because it does not match folder pattern.', folder_hint)
                     continue
 
-            prefix = folder_prefix # TODO Normalmente vacio salvo "." para albumes de caras
+            prefix = folder_prefix  # TODO Normalmente vacio salvo "." para albumes de caras
             if folder_hint is not None:
                 for parent_folder in folder_hint.split('/'):
                     prefix = prefix + imageutils.make_foldername(parent_folder) + "/"
@@ -786,6 +787,7 @@ def get_option_parser():
     p.add_option('--version', action='store_true', 
                  help='Print build version and exit.')
     return p
+
 
 def run_phoshare(cmd_args):
     """main routine for phoshare."""

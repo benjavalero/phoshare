@@ -53,11 +53,13 @@ _BOLD_FONT = ('helvetica', 12, 'bold')
 
 _logger = logging.getLogger('google')
 
+
 def _int_from_bool(boolean_value):
     """Converts a boolean value to an integer of 0 or 1."""
     if boolean_value:
         return 1
     return 0
+
 
 class Notebook(Frame):
     """A widget for a tabbed panel. Doesn't look very good, and the new tkk.Notebook in Python 2.7.1
@@ -119,6 +121,7 @@ class HelpDialog(Toplevel):
         t.insert(END, text)
         t.config(state=DISABLED)
         t.pack()
+
 
 class ExportApp(Frame):
     """GUI version of the Phoshare tool."""
@@ -270,7 +273,7 @@ https://github.com/benjavalero/phoshare""" % (phoshare_version.PHOSHARE_VERSION,
         content_frame = Frame(section_frame)
         content_frame.grid(row=1, column=0, columnspan=2, sticky=N+S+E+W, pady=5)
 
-        return (section_frame, content_frame)
+        return section_frame, content_frame
 
     def _create_button_bar(self, container, row):
         """Creates the button bar with the Dry Run and Export buttons.
@@ -837,8 +840,7 @@ Metadata options will be disabled if exiftool is not available.""")
             configfile.close()
 
     def can_export(self):
-        if (not self.albums.get() and not self.events.get() and
-            not self.smarts.get()):
+        if not self.albums.get() and not self.events.get() and not self.smarts.get():
             tkMessageBox.showerror(
                 "Export Error",
                 ("Need to specify at least one event, album, or smart album "
@@ -876,7 +878,7 @@ Metadata options will be disabled if exiftool is not available.""")
             data = None
             try:
                 data = iphotodata.get_iphoto_data(library_path)
-            except ValueError, e:
+            except ValueError as e:
                 self.thread_queue.put(("done", (False, mode, str(e))))
                 return
 
@@ -966,7 +968,7 @@ Metadata options will be disabled if exiftool is not available.""")
                                         options)
             self.thread_queue.put(("done", (True, mode, '')))
 
-        except Exception, e:  # IGNORE:W0703
+        except Exception as e:  # IGNORE:W0703
             self.thread_queue.put(("done",
                                    (False, mode,
                                     str(e) + '\n\n' + traceback.format_exc())))
@@ -1030,7 +1032,7 @@ def main():
     try:
         app.init()
         app.mainloop()
-    except Exception, e:
+    except Exception as e:
         f = cStringIO.StringIO()
         traceback.print_exc(file=f)
         app.write_progress('--- Fatal Error ---\n')

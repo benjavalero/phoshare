@@ -16,6 +16,7 @@
 
 import time
 
+
 class Throttle(object):
     """Throttle for placing calls to not exceed a per second rate.
     

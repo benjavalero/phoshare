@@ -81,6 +81,7 @@ def should_create(options):
         options.max_create -= 1
     return True
 
+
 def should_delete(options):
     """Returns True if a delete should be performed, based on options. Does not
        check options.dryrun."""
@@ -94,6 +95,7 @@ def should_delete(options):
     if options.max_delete != -1:
         options.max_delete -= 1
     return True
+
 
 def should_update(options):
     """Returns True if an update should be performed, based on options. Does not
@@ -132,6 +134,7 @@ def make_foldername(name):
         else:
             result += '_'
     return result
+
 
 def make_image_filename(name):
     """Returns a valid file name by replacing problematic characters."""
@@ -430,6 +433,7 @@ def get_photo_caption(photo, container, caption_template):
 
 _YEAR_PATTERN_INDEX = re.compile(r'([0-9][0-9][0-9][0-9]) (.*)')
 
+
 def format_album_name(album, name, folder_template):
     """Formats a folder name using a template.
 
@@ -467,7 +471,7 @@ def format_album_name(album, name, folder_template):
             yyyy=year,
             mm=month,
             dd=day)
-    except KeyError, ex:
+    except KeyError as ex:
         su.pout(u'Unrecognized field in folder template: %s. Use one of: name, ascii_name, '
                 'plain_name, yyyy, mm, dd.' % (str(ex)))
         return folder_template
@@ -526,7 +530,7 @@ def format_photo_name(photo, album_name, index, padded_index,
                                               yyyy=year,
                                               mm=month,
                                               dd=day)
-    except KeyError, ex:
+    except KeyError as ex:
         su.pout(u'Unrecognized field in name template: %s. Use one of: index, index0, event_index, '
                 'event_index0, album, ascii_album, event, ascii_event, title, ascii_title, '
                 'yyyy, mm, or dd.' % (str(ex)))
@@ -534,6 +538,7 @@ def format_photo_name(photo, album_name, index, padded_index,
         
     # Take out invalid characters, like '/'
     return make_image_filename(formatted_name)
+
 
 def copy_or_link_file(source, target, dryrun=False, link=False,
                       options=None):

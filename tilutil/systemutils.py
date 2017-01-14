@@ -94,6 +94,7 @@ def nn_string(value):
         return ''
     return value
 
+
 def unicode_string(value):
     """Returns a unicode string, taking care of None and converting non-unicode
        input strings."""
@@ -102,6 +103,7 @@ def unicode_string(value):
     if isinstance(value, unicode):
         return value
     return unicode(value, _sysenc)
+
 
 # FileUtil --------------------------------------------------------------------
 
@@ -122,17 +124,19 @@ def fsenc(value):
         return ""
     return value.encode(_sysenc, "replace")
 
+
 def fsdec(value):
     '''Helper to decode a string using the system encoding'''
     if not value:
         return ""
     return value.decode(_sysenc)
 
+
 def pout(msg):
     '''Prints a message to sys.stdout, taking care of character encodings.'''
     try:
         print fsenc(msg)
-    except UnicodeError, e:
+    except UnicodeError as e:
         print '%s (ignored)' % str(e)
          
 """
