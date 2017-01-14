@@ -561,11 +561,18 @@ class ExportLibrary(object):
                 return proposed
             i += 1
 
-    def process_albums(self, albums, album_types, folder_prefix, includes,
-                       options):
+    def process_albums(self, albums, album_types, folder_prefix, options):
         """Walks trough an Photos album tree, and discovers albums
            (directories)."""
-        include_pattern = re.compile(su.unicode_string(includes))
+        album_includes = "."
+        if options.albums:
+            album_includes = options.albums
+        album_pattern = re.compile(su.unicode_string(album_includes), re.IGNORECASE)
+
+        folder_includes = "."
+        if options.events:
+            folder_includes = options.events
+        folder_pattern = re.compile(su.unicode_string(folder_includes), re.IGNORECASE)
 
         for sub_album in albums:
             if self._check_abort():
@@ -575,24 +582,36 @@ class ExportLibrary(object):
                 print "Found an album with no name: " + sub_album.albumid
                 sub_name = "xxx"
             
-            # check the album type
+            # TODO check the album type
             if (sub_album.albumtype == "None" or
                 sub_album.albumtype not in album_types):
                 # print "Ignoring " + sub_album.name + " of type " + \
                 # sub_album.albumtype
                 continue
 
-            if not include_pattern.match(sub_name):
-                _logger.debug(u'Skipping "%s" because it does not match pattern.', sub_name)
+            if not album_pattern.match(sub_name):
+                _logger.debug(u'Skipping "%s" because it does not match album pattern.', sub_name)
                 continue
 
             _logger.debug(u'Loading "%s".', sub_name)
 
             folder_hint = sub_album.getfolderhint()
+            _logger.debug(u'Parent folders: %s', folder_hint)
+
+            if folder_hint is not None:
+                isFolderMatch = False
+                for parent_folder in folder_hint.split('/'):
+                    if folder_pattern.match(parent_folder):
+                        isFolderMatch = True
+                        break
+                if not isFolderMatch:
+                    _logger.debug(u'Skipping "%s" because it does not match folder pattern.', folder_hint)
+                    continue
 
             prefix = folder_prefix # TODO Normalmente vacio salvo "." para albumes de caras
             if folder_hint is not None:
-                prefix = prefix + imageutils.make_foldername(folder_hint) + "/"
+                for parent_folder in folder_hint.split('/'):
+                    prefix = prefix + imageutils.make_foldername(parent_folder) + "/"
             formatted_name = imageutils.format_album_name(
                 sub_album, sub_name, options.foldertemplate)
             sub_name = prefix + imageutils.make_foldername(formatted_name)
@@ -667,25 +686,16 @@ def export_iphoto(library, data, options):
     """Main routine for exporting Photos images."""
 
     print "Scanning Photos data for photos to export..."
-    if options.events:
-        library.process_albums(data.root_album.albums, ["Event"], u'',
-                               options.events, options)
 
-    if options.albums:
-        # ignore: Selected Event Album, Special Roll, Special Month
-        library.process_albums(data.root_album.albums,
-                               ["Regular", "Published"], u'',
-                               options.albums, options)
+    if options.events or options.albums:
+        library.process_albums(data.root_album.albums, ["Regular", "Published"], u'', options)
 
     if options.smarts:
-        library.process_albums(data.root_album.albums,
-                               ["Smart", "Special Roll", "Special Month", "Flagged"], u'',
-                               options.smarts, options)
+        library.process_albums(data.root_album.albums, ["Smart", "Special Roll", "Special Month", "Flagged"], u'',
+                               options)
 
     if options.facealbums:
-        library.process_albums(data.getfacealbums(), ["Face"],
-                               unicode(options.facealbum_prefix),
-                               ".", options)
+        library.process_albums(data.getfacealbums(), ["Face"], unicode(options.facealbum_prefix), options)
 
     print "Scanning existing files in export folder..."
     library.load_album(options)
@@ -716,9 +726,9 @@ def get_option_parser():
         "--dryrun", action="store_true",
         help="""Show what would have been done, but don't change or copy any
              files.""")
-    p.add_option("-e", "--events",
-                 help="""Export matching events. The argument is
-                 a regular expression. Use -e . to export all events.""")
+    p.add_option("-e", "--folders", dest="events",
+                 help="""Export matching folders. The argument is
+                 a regular expression. Use -e . to export all folders.""")
     p.add_option("--export",
                  help="""Export images and movies to specified folder.
                       Any files found in this folder that are not part of the

@@ -22,13 +22,13 @@ There still some disabled features and possible issues:
 - [ ] Export originals
 - [ ] Take into account other album types, like smart or iCloud albums.
 - [ ] Export also the images hanging from the root album.
-- [ ] Use the olde feature to filter events to filter album folders.
 - [ ] Enable metadata export.
 - [ ] Enable face albums export, in case these stil exist.
 - [ ] Fix Python PEP8 and Code Inspections.
 - [ ] Clean-up entirely the code once the old features are all restored or completely discarded.
 - [ ] Fix issue if the Photos library path contains non-Ascii characters.
 - [ ] Fix issue if the export path contains non-Ascii characters.
+- [ ] Fix issue if any export filter contains non-Ascii characters.
 - [ ] When exporting try to keep in the filesystem to file dates equal to the image date.
 - [ ] Test what happens when importing to Photos an old image without metadata, and thus with no image date.
 - [ ] Test the current behaviour when exporting metadata (when enabled) if the export file is a hard link.

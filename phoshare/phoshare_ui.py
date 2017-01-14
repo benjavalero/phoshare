@@ -204,7 +204,7 @@ class ExportApp(Frame):
     Copyright 2014 Luke Hagan
     Copyright 2017 Benjamín Valero
 
-http://code.google.com/p/phoshare""" % (phoshare_version.PHOSHARE_VERSION,),
+https://github.com/benjavalero/phoshare""" % (phoshare_version.PHOSHARE_VERSION,),
                    title="About Phoshare")
 
     def init(self):
@@ -311,12 +311,12 @@ http://code.google.com/p/phoshare""" % (phoshare_version.PHOSHARE_VERSION,),
         self.library_status = Label(f, textvariable=self.iphoto_library_status)
         self.library_status.grid(row=1, column=1, sticky=W)
 
-        (cf, lf) = self._add_section(library_tab, "Events, Albums and Smart Albums",
+        (cf, lf) = self._add_section(library_tab, "Folders, Albums and Smart Albums",
                                      self.help_events)
         cf.grid(row=row, columnspan=2, stick=E+W)
         row += 1
         lf.columnconfigure(1, weight=1)
-        Label(lf, text="Events:").grid(sticky=E)
+        Label(lf, text="Folders:").grid(sticky=E)
         events_entry = Entry(lf, textvariable=self.events)
         events_entry.grid(row=0, column=1, sticky=EW)
 
@@ -480,22 +480,22 @@ http://code.google.com/p/phoshare""" % (phoshare_version.PHOSHARE_VERSION,),
             self.iptc_var.set(1)
 
     def help_events(self):
-        HelpDialog(self, """Events, Albums and Smart Albums
+        HelpDialog(self, """Folders, Albums and Smart Albums
 
-Selects which events, albums, or smart albums to export.
+Selects which folders, albums, or smart albums to export.
 
 Each field is a regular expression, and at least one must be filled in.
-Matches are done against the beginning of the event or album name. An
+Matches are done against the beginning of the folder or album name. An
 entry in Events of
     Family
-will export all events that start with "Family", including "Family 2008"
+will export all folders that start with "Family", including "Family 2008"
 and "Family 2009". "|" separates alternate patterns, so
     Family|Travel
-will export all events that start with either "Family" or "Travel".
+will export all folders that start with either "Family" or "Travel".
 
 "." matches any character, and therefore,
     .
-will export all events. To export all events with "2008" in the name, use
+will export all folders. To export all folders with "2008" in the name, use
     .*2008
 
 For more details on regular expressions, see
@@ -902,7 +902,7 @@ Metadata options will be disabled if exiftool is not available.""")
                 args.extend(['--albums', '"' + options.albums + '"'])
             options.events = self.events.get()
             if options.events:
-                args.extend(['--events', '"' + options.events + '"'])
+                args.extend(['--folders', '"' + options.events + '"'])
             options.smarts = self.smarts.get()
             if options.smarts:
                 args.extend(['--smarts', '"' + options.smarts + '"'])
@@ -1045,7 +1045,7 @@ def main():
             'Phoshare encountered a serious problem and will shut down. '
             'Please copy the information shown in the application output panel '
             'when reporting this problem at\n'
-            'http://code.google.com/p/phoshare/issues/entry\n\n%s.' % (str(e)))
+            'https://github.com/benjavalero/phoshare/issues\n\n%s.' % (str(e)))
         raise e
 
 if __name__ == "__main__":
