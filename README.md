@@ -18,6 +18,7 @@ The adaptation to Photos library is still in progress, although the main feature
 
 There still some disabled features and possible issues:
 
+- [ ] Make script to generate an OS X app
 - [ ] Export originals
 - [ ] Take into account other album types, like smart or iCloud albums.
 - [ ] Export also the images hanging from the root album.
@@ -28,7 +29,6 @@ There still some disabled features and possible issues:
 - [ ] Clean-up entirely the code once the old features are all restored or completely discarded.
 - [ ] Fix issue if the Photos library path contains non-Ascii characters.
 - [ ] Fix issue if the export path contains non-Ascii characters.
-- [ ] Test what happens if the image filename to export contains non-Ascii characters.
 - [ ] When exporting try to keep in the filesystem to file dates equal to the image date.
 - [ ] Test what happens when importing to Photos an old image without metadata, and thus with no image date.
 - [ ] Test the current behaviour when exporting metadata (when enabled) if the export file is a hard link.

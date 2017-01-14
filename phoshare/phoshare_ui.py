@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Reads Photos library info, and exports photos and movies. GUI version."""
 
 # Original work Copyright 2010 Google Inc.

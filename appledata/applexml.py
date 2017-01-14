@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 '''Reads Photo SQLite database'''
 
 # Original work Copyright 2010 Google Inc.
@@ -108,7 +109,7 @@ def read_apple_library(photos_library_dir):
             attached_model_id = int(result[0])
             resource_dict = {}
             resource_dict['resource_uuid'] = result[1]
-            resource_dict['filename'] = result[2]
+            resource_dict['filename'] = unicodedata.normalize("NFC", result[2])
             resources_dict[attached_model_id] = resource_dict
 
     if photos_metaschema_file:
@@ -184,7 +185,7 @@ def read_apple_library(photos_library_dir):
         for result in c2.fetchall():
             model_id = int(result[0])
             master_dict = {}
-            master_dict['ImagePath'] = result[1]
+            master_dict['ImagePath'] = unicodedata.normalize("NFC", result[1])
             masters_dict[model_id] = master_dict
 
         # Images

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 '''Photos database: reads Photos database and parses it into albums and images.
 
 @author: tsporkert@gmail.com
