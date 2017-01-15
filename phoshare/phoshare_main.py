@@ -118,16 +118,14 @@ class ExportFile(object):
         self.export_file = os.path.join(
             export_directory, base_name + '.' + extension)
 
-        '''
         # Location of "Original" file, if any.
         originals_folder = u"Originals"
         if photo.originalpath:
+            original_filename = os.path.split(photo.originalpath)[1]
             self.original_export_file = os.path.join(
-                export_directory, originals_folder, base_name + "." +
-                su.getfileextension(photo.originalpath))
+                export_directory, originals_folder, original_filename)
         else:
             self.original_export_file = None
-        '''
 
     '''
     def get_photo(self):
@@ -173,7 +171,7 @@ class ExportFile(object):
 
         return False
 
-    '''
+
     def _generate_original(self, options):
         """Exports the original file."""
         do_original_export = False
@@ -203,12 +201,15 @@ class ExportFile(object):
         else:
             do_original_export = True
 
+        '''
         do_iptc = (options.iptc == 1 and
                    do_original_export) or options.iptc == 2
         if do_iptc and options.link:
             if self.check_iptc_data(original_source_file, options,
                                     is_original=True, file_updated=do_original_export):
                 do_original_export = True
+        '''
+
         exists = True  # True if the file exists or was updated.
         if do_original_export:
             exists = imageutils.copy_or_link_file(original_source_file,
@@ -218,10 +219,12 @@ class ExportFile(object):
                                                   options)
         else:
             _logger.debug(u'%s up to date.', self.original_export_file)
+
+        '''
         if exists and do_iptc and not options.link:
             self.check_iptc_data(self.original_export_file, options,
                                  is_original=True, file_updated=do_original_export)
-    '''
+        '''
 
     def generate(self, options):
         """makes sure all files exist in other album, and generates if
@@ -250,11 +253,11 @@ class ExportFile(object):
             # if we copy, we update the IPTC data in the copied file
             if exists and do_iptc and not options.link:
                 self.check_iptc_data(self.export_file, options, file_updated=do_export)
-
-            if (options.originals and self.photo.originalpath and
-                not self.photo.rotation_is_only_edit):
-                self._generate_original(options)
             '''
+
+            if options.originals and self.photo.originalpath:
+                self._generate_original(options)
+
         except (OSError, MacOS.Error) as ose:
             su.perr(u"Failed to export %s to %s: %s" % (self.photo.image_path, self.export_file,
                                                         ose))
@@ -478,7 +481,7 @@ class ExportDirectory(object):
                 delete_album_file(album_file, self.albumdirectory,
                                   "Obsolete exported file", options)
 
-    '''
+
     def scan_originals(self, folder, options):
         """Scan a folder of Original images, and delete obsolete ones."""
         file_list = os.listdir(folder)
@@ -486,9 +489,11 @@ class ExportDirectory(object):
             return
 
         for f in file_list:
+            '''
             # We won't touch some files.
             if imageutils.is_ignore(f):
                 continue
+            '''
 
             originalfile = unicodedata.normalize("NFC", os.path.join(folder, f))
             if os.path.isdir(originalfile):
@@ -503,11 +508,10 @@ class ExportDirectory(object):
 
             # everything else must have a master, or will have to go
             if (not master_file or
-                originalfile != master_file.original_export_file or
-                master_file.photo.rotation_is_only_edit):
+                originalfile != master_file.original_export_file):
                 delete_album_file(originalfile, originalfile,
                                   "Obsolete Original", options)
-        '''
+
 
     def generate_files(self, options):
         """Generates the files in the export location."""

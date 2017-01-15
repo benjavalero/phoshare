@@ -373,8 +373,11 @@ class IPhotoImage(object):
         if keyword_list is not None:
             for i in keyword_list:
                 self.keywords.append(keyword_map.get(i))
+        '''
 
         self.originalpath = data.get("OriginalPath")
+
+        '''
         self.roll = data.get("Roll") 
 
         self.albums = []  # list of albums that this image belongs to
@@ -465,11 +468,6 @@ class IPhotoImage(object):
     def _getthumbpath(self):
         return self.data.get("ThumbPath")
     thumbpath = property(_getthumbpath, doc="Path to thumbnail image")
-
-    def _getrotationisonlyedit(self):
-        return self.data.get("RotationIsOnlyEdit")
-    rotation_is_only_edit = property(_getrotationisonlyedit,
-                                     doc="Rotation is only edit.")
 
     def _search_for_file(self, folder_path, basename):
         """Scans recursively through a folder tree and returns the path to the

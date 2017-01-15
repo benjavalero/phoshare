@@ -192,6 +192,10 @@ def read_apple_library(photos_library_dir):
         images = {}
         for master_id in masters_dict:
             image_data = {}
+
+            master_dict = masters_dict[master_id]
+            original_path = os.path.join(photos_library_dir, 'Masters', master_dict['ImagePath'])
+
             if master_id in resources_dict:
                 resource_dict = resources_dict[master_id]
                 resource_uuid = resource_dict['resource_uuid']
@@ -200,10 +204,10 @@ def read_apple_library(photos_library_dir):
                 filename = resource_dict['filename']
                 image_data['ImagePath'] = os.path.join(photos_library_dir, 'resources', 'modelresources',
                                                        folder1, folder2, resource_uuid, filename)
+                image_data['OriginalPath'] = original_path
             else:
-                master_dict = masters_dict[master_id]
-                image_path = master_dict['ImagePath']
-                image_data['ImagePath'] = os.path.join(photos_library_dir, 'Masters', image_path)
+                image_data['ImagePath'] = original_path
+
             version_dict = versions_dict[master_id]
             image_data['Caption'] = version_dict['VersionName']
             image_data['ImageDate'] = version_dict['VersionDate']

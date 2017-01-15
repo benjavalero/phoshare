@@ -19,7 +19,6 @@ The adaptation to Photos library is still in progress, although the main feature
 There still some disabled features and possible issues:
 
 - [ ] Make script to generate an OS X app
-- [ ] Export originals
 - [ ] Take into account other album types, like smart or iCloud albums.
 - [ ] Export also the images hanging from the root album.
 - [ ] Enable metadata export.
