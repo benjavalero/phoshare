@@ -164,7 +164,6 @@ class ExportApp(Frame):
 
         self.events = StringVar()
         self.albums = StringVar()
-        self.smarts = StringVar()
 
         self.foldertemplate = StringVar()
         self.nametemplate = StringVar()
@@ -233,7 +232,6 @@ https://github.com/benjavalero/phoshare""" % (phoshare_version.PHOSHARE_VERSION,
         self.export_folder.set(options.export)
         self.albums.set(su.fsdec(options.albums))
         self.events.set(su.fsdec(options.events))
-        self.smarts.set(su.fsdec(options.smarts))
         self.foldertemplate.set(su.unicode_string(options.foldertemplate))
         self.nametemplate.set(su.unicode_string(options.nametemplate))
         self.captiontemplate.set(su.unicode_string(options.captiontemplate))
@@ -314,7 +312,7 @@ https://github.com/benjavalero/phoshare""" % (phoshare_version.PHOSHARE_VERSION,
         self.library_status = Label(f, textvariable=self.iphoto_library_status)
         self.library_status.grid(row=1, column=1, sticky=W)
 
-        (cf, lf) = self._add_section(library_tab, "Folders, Albums and Smart Albums",
+        (cf, lf) = self._add_section(library_tab, "Folders and Albums",
                                      self.help_events)
         cf.grid(row=row, columnspan=2, stick=E+W)
         row += 1
@@ -326,10 +324,6 @@ https://github.com/benjavalero/phoshare""" % (phoshare_version.PHOSHARE_VERSION,
         Label(lf, text="Albums:").grid(sticky=E)
         albums_entry = Entry(lf, textvariable=self.albums)
         albums_entry.grid(row=1, column=1, sticky=EW)
-
-        Label(lf, text="Smart Albums:").grid(sticky=E)
-        smarts_entry = Entry(lf, textvariable=self.smarts)
-        smarts_entry.grid(row=2, column=1, columnspan=3, sticky=EW)
 
         # Fill up the tab so the size matches the other tabs (Notebook resizes when you switch tabs)
         Label(lf, text="").grid(sticky=E)
@@ -483,9 +477,9 @@ https://github.com/benjavalero/phoshare""" % (phoshare_version.PHOSHARE_VERSION,
             self.iptc_var.set(1)
 
     def help_events(self):
-        HelpDialog(self, """Folders, Albums and Smart Albums
+        HelpDialog(self, """Folders and Albums
 
-Selects which folders, albums, or smart albums to export.
+Selects which folders or albums to export.
 
 Each field is a regular expression, and at least one must be filled in.
 Matches are done against the beginning of the folder or album name. An
@@ -732,7 +726,6 @@ Metadata options will be disabled if exiftool is not available.""")
             self.export = '~/Pictures/Album'
             self.albums = ''
             self.events = '.'
-            self.smarts = ''
             self.delete = False
             self.update = False
             self.max_create = -1
@@ -768,8 +761,6 @@ Metadata options will be disabled if exiftool is not available.""")
                 self.albums = config.get(s, 'albums')
             if config.has_option(s, 'events'):
                 self.events = config.get(s, 'events')
-            if config.has_option(s, 'smarts'):
-                self.smarts = config.get(s, 'smarts')
             if config.has_option(s, 'foldertemplate'):
                 self.foldertemplate = config.get(s, 'foldertemplate')
             if config.has_option(s, 'nametemplate'):
@@ -811,7 +802,6 @@ Metadata options will be disabled if exiftool is not available.""")
             config.set(s, 'export', self.export)
             config.set(s, 'albums', su.fsenc(self.albums))
             config.set(s, 'events', su.fsenc(self.events))
-            config.set(s, 'smarts', su.fsenc(self.smarts))
             config.set(s, 'foldertemplate', su.fsenc(self.foldertemplate))
             config.set(s, 'nametemplate', su.fsenc(self.nametemplate))
             config.set(s, 'captiontemplate', su.fsenc(self.captiontemplate))
@@ -840,10 +830,10 @@ Metadata options will be disabled if exiftool is not available.""")
             configfile.close()
 
     def can_export(self):
-        if not self.albums.get() and not self.events.get() and not self.smarts.get():
+        if not self.albums.get() and not self.events.get():
             tkMessageBox.showerror(
                 "Export Error",
-                ("Need to specify at least one event, album, or smart album "
+                ("Need to specify at least one event or album "
                  "for exporting."))
             return False
         return True
@@ -905,9 +895,6 @@ Metadata options will be disabled if exiftool is not available.""")
             options.events = self.events.get()
             if options.events:
                 args.extend(['--folders', '"' + options.events + '"'])
-            options.smarts = self.smarts.get()
-            if options.smarts:
-                args.extend(['--smarts', '"' + options.smarts + '"'])
             options.foldertemplate = unicode(self.foldertemplate.get())
             if options.foldertemplate:
                 args.extend(['--foldertemplate', '"' +

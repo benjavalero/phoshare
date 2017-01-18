@@ -695,10 +695,6 @@ def export_iphoto(library, data, options):
     if options.events or options.albums:
         library.process_albums(data.root_album.albums, ["Regular", "Published"], u'', options)
 
-    if options.smarts:
-        library.process_albums(data.root_album.albums, ["Smart", "Special Roll", "Special Month", "Flagged"], u'',
-                               options)
-
     if options.facealbums:
         library.process_albums(data.getfacealbums(), ["Face"], unicode(options.facealbum_prefix), options)
 
@@ -781,9 +777,6 @@ def get_option_parser():
                  help="""Template for naming image files. Default: "{title}".""")
     p.add_option("-o", "--originals", action="store_true",
                  help="Export original files into Originals.")
-    p.add_option("-s", "--smarts",
-                 help="""Export matching smart albums. The argument
-                 is a regular expression. Use -s . to export all smart albums.""")
     p.add_option("-u", "--update", action="store_true",
                  help="Update existing files.")
     p.add_option('--verbose', action='store_true', 
@@ -812,11 +805,9 @@ def run_phoshare(cmd_args):
         parser.error("Need to specify the Photos library with the --iphoto option.")
 
     if options.export:
-        if not (options.albums or options.events or options.smarts or
-                options.facealbums):
-            parser.error("Need to specify at least one event, album, or smart "
-                         "album for exporting, using the -e, -a, or -s "
-                         "options.")
+        if not (options.albums or options.events or options.facealbums):
+            parser.error("Need to specify at least one event or album "
+                         "or exporting, using the -e or -a options.")
     else:
         parser.error("No action specified. Use --export to export from your "
                      "Photos library.")
